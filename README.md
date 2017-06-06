@@ -3,7 +3,7 @@
 O trabalho consiste em implementar, utilizando a linguagem _SystemC_, um módulo de criptografia que utiliza o __IDEA__ (_International Data Encryption Algorithm_) que é um algoritmo de cifra de bloco (simétrica) que faz uso de chaves de 128 bits e que tem uma estrutura semelhante ao _DES_.
 
 <p align="center">
-  <img src="IDEA.png">
+  <img src="IDEA_round.png">
   <br>
   <t><b>Figura 1</b>: Um round de criptografia do IDEA.</t>
   <br>
