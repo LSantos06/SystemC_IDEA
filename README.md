@@ -22,7 +22,7 @@ A partir da _chave secreta_ de 128 bits, são geradas 52 _sub-chaves_ de 16 bits
 </p>
 
 <p align="center">
-  <img src="img/IDEA_output.png">
+  <img src="img/IDEA_half_round.png">
   <br>
   <t><b>Figura 2</b>: <i>Round final</i> (<i>half-round</i>) de criptografia do IDEA.</t>
   <br>

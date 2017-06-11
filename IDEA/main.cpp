@@ -14,5 +14,7 @@ int sc_main (int arc, char * argv[]){
 	/* Instanciacao do IDEA */
 	idea IDEA_i("IDEA_i");
 
+	IDEA_i.descifrar_cifrar();
+
 	return 0;
 }

@@ -10,20 +10,25 @@
 #ifndef IDEA_H
 #define IDEA_H
 
+#define TESTES 1
+
 #include <systemc.h>
 
 /* Registradores (32 bits) do modulo:
  *	[0] = CMD
  *
- *	[1] = W0W1
- *	[2] = W2W3
+ *	[1] = W1W0
+ *	[2] = W3W2
  *
- *  [3] = KG0
- *  [4] = KG1
- *  [5] = KG2
- *  [6] = KG3
+ *	[3] = KG0
+ *	[4] = KG1
+ *	[5] = KG2
+ *	[6] = KG3
  */
+
 const short N_REGS = 7;
+const short N_WORDS = 4;
+const short N_SUBKEYS = 52;
 
 class idea
 	: public sc_module{
@@ -38,10 +43,15 @@ public:
 	idea(sc_module_name nome_)
 		: sc_module(nome_){
 
-		// Inicializando os regs
+		// Inicializando os REGS
 		REGS = new uint32_t[N_REGS];
 	    for (unsigned int i = 0; i < N_REGS; ++i)
 	    	REGS[i] = 0;
+		// Inicializando as SUBKEYS
+	    SUBKEYS = new uint16_t[N_SUBKEYS];
+	    for (unsigned int i = 0; i < N_SUBKEYS; ++i)
+	    	SUBKEYS[i] = 0;
+
 	}
 
 	/* Destrutor */
@@ -53,14 +63,14 @@ public:
 	/* Processos */
 	// Pega o comando e decide a acao
 	void getCMD();
+
 	// Geracao das 52 subchaves para descifrar
 	void subchaves_descifrar();
 	// Geracao das 52 subchaves para cifrar
 	void subchaves_cifrar();
-	// Descifrar uma entrada (64 bits)
-	void descifrar();
-	// Cifrar uma entrada (64 bits)
-	void cifrar();
+	// Descifrar ou Cifrar uma entrada (64 bits)
+	void descifrar_cifrar();
+
 	// Status atual do modulo de acordo com a enum
 	void getStatus();
 
@@ -68,6 +78,8 @@ private:
 	// Registradores (32 bits)
 	uint32_t *REGS;
 
+	// Sub-chaves (16 bits)
+	uint16_t *SUBKEYS;
 };
 
 
