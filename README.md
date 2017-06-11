@@ -31,7 +31,7 @@ A partir da _chave secreta_ de 128 bits, são geradas 52 _sub-chaves_ de 16 bits
 #### Grupo
 * Lucas Avelino
   * Matrícula: 13/0013072
-  * GitHub: ![lucasavelino](https://github.com/lucasavelino)
+  * GitHub: [lucasavelino](https://github.com/lucasavelino)
 * Lucas Nascimento
   * Matrícula: 14/0151010
-  * GitHub: ![LSantos06](https://github.com/LSantos06)
+  * GitHub: [LSantos06](https://github.com/LSantos06)
