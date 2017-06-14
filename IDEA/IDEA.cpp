@@ -74,7 +74,8 @@ void idea::descifrar_cifrar(){
 
 #if TESTES == 1
 	// Valores de teste REGS[1] e REGS[2]
-	REGS[1] = 0x12345678;
+	printf("Teste SEPARACAO\n");
+    REGS[1] = 0x12345678;
 	printf("W1W0: 0x%x\n", REGS[1]);
 	REGS[2] = 0x9ABCDEF0;
 	printf("W3W2: 0x%x\n", REGS[2]);
@@ -83,21 +84,40 @@ void idea::descifrar_cifrar(){
 	/* Dividindo as palavras para cripografia */
 	// WORDS[0] = W0 = 2 bytes MENOS significativos de REGS[1]
 	WORDS[0] = REGS[1] & 0xFFFF;
-	printf("W0: 0x%x\n", WORDS[0]);
 
 	// WORDS[1] = W1 = 2 bytes MAIS significativos de REGS[1]
 	WORDS[1] = REGS[1] >> 16;
-	printf("W1: 0x%x\n", WORDS[1]);
 
 	// WORDS[2] = W2 = 2 bytes MENOS significativos de REGS[2]
 	WORDS[2] = REGS[2] & 0xFFFF;
-	printf("W2: 0x%x\n", WORDS[2]);
 
 	// WORDS[3] = W3 = 2 bytes MAIS significativos de REGS[2]
 	WORDS[3] = REGS[2] >> 16;
-	printf("W3: 0x%x\n", WORDS[3]);
 
+#if TESTES == 1
+	// Resultado separacao
+	printf("W0: 0x%x\n", WORDS[0]);
+	printf("W1: 0x%x\n", WORDS[1]);
+	printf("W2: 0x%x\n", WORDS[2]);
+	printf("W3: 0x%x\n\n", WORDS[3]);
+#endif
 
+#if TESTES == 1
+	// Testes para as operacoes
+	printf("Teste XOR\n");
+	printf("W0 xor W1 = 0x%x\n", xor_IDEA(WORDS[0],WORDS[1]));
+	printf("W2 xor W3 = 0x%x\n\n", xor_IDEA(WORDS[2],WORDS[3]));
+	printf("Teste ADD\n");
+	printf("W0 add W1 = 0x%x\n", add_IDEA(WORDS[0],WORDS[1]));
+	printf("W2 add W3 = 0x%x\n", add_IDEA(WORDS[2],WORDS[3]));
+	printf("-1 add -1 = 0x%x\n\n", add_IDEA(-1,-1));
+	printf("Teste MUL\n");
+	printf("W0 mul W1 = 0x%x\n", mul_IDEA((uint32_t)WORDS[0],(uint32_t)WORDS[1]));
+	printf("W2 mul W3 = 0x%x\n", mul_IDEA((uint32_t)WORDS[2],(uint32_t)WORDS[3]));
+	printf("0 mul W1 = 0x%x\n", mul_IDEA(0,(uint32_t)WORDS[1]));
+	printf("W2 mul 0 = 0x%x\n", mul_IDEA((uint32_t)WORDS[2],0));
+	printf("MODULO_ADD mul 1 = 0x%x\n\n", mul_IDEA(MODULO_ADD,1));
+#endif
 
 }
 

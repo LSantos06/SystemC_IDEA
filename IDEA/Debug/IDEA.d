@@ -1,4 +1,4 @@
-IDEA.d: ../IDEA.cpp ../IDEA.h ../IDEA_operations.h \
+IDEA.d: ../IDEA.cpp ../IDEA.h ../IDEA_rounds.h ../IDEA_operations.h \
  /usr/local/systemc/include/systemc.h /usr/local/systemc/include/systemc \
  /usr/local/systemc/include/sysc/kernel/sc_cmnhdr.h \
  /usr/local/systemc/include/sysc/packages/boost/config.hpp \
@@ -114,6 +114,8 @@ IDEA.d: ../IDEA.cpp ../IDEA.h ../IDEA_operations.h \
  /usr/local/systemc/include/sysc/packages/boost/utility/enable_if.hpp
 
 ../IDEA.h:
+
+../IDEA_rounds.h:
 
 ../IDEA_operations.h:
 

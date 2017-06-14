@@ -6,16 +6,19 @@
 CPP_SRCS += \
 ../IDEA.cpp \
 ../IDEA_operations.cpp \
+../IDEA_rounds.cpp \
 ../main.cpp 
 
 OBJS += \
 ./IDEA.o \
 ./IDEA_operations.o \
+./IDEA_rounds.o \
 ./main.o 
 
 CPP_DEPS += \
 ./IDEA.d \
 ./IDEA_operations.d \
+./IDEA_rounds.d \
 ./main.d 
 
 

@@ -10,7 +10,7 @@
 #ifndef IDEA_H
 #define IDEA_H
 
-#include "IDEA_operations.h"
+#include "IDEA_rounds.h"
 
 const short N_REGS = 7;
 const short N_WORDS = 4;

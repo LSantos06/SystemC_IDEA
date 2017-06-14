@@ -27,20 +27,6 @@ uint16_t add_IDEA(uint16_t, uint16_t);
 // Multiplicacao mod 2^(16+1), onde:
 //  - Se alguma entrada for 0 => 2^(16)
 //  - Se a saida for 2^(16) => 0
-uint16_t mul_IDEA(uint16_t, uint16_t);
-
-
-/* Linhas de operações do IDEA */
-// Recebe as 4 primeiras sub-chaves do round atual
-void linha_1(uint16_t, uint16_t, uint16_t, uint16_t);
-
-// Não recebe sub-chaves
-void linha_2_3();
-
-// Recebe a 5 e 6 sub-chave do round atual
-void linha_4_5(uint16_t, uint16_t);
-
-// Não recebe sub-chaves
-void linha_6_7();
+uint16_t mul_IDEA(uint32_t, uint32_t);
 
 #endif
