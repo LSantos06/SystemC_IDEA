@@ -97,6 +97,8 @@ void idea::descifrar_cifrar(){
 	WORDS[3] = REGS[2] >> 16;
 	printf("W3: 0x%x\n", WORDS[3]);
 
+
+
 }
 
 /*

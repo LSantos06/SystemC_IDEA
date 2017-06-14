@@ -10,21 +10,7 @@
 #ifndef IDEA_H
 #define IDEA_H
 
-#define TESTES 1
-
-#include <systemc.h>
-
-/* Registradores (32 bits) do modulo:
- *	[0] = CMD
- *
- *	[1] = W1W0
- *	[2] = W3W2
- *
- *	[3] = KG0
- *	[4] = KG1
- *	[5] = KG2
- *	[6] = KG3
- */
+#include "IDEA_operations.h"
 
 const short N_REGS = 7;
 const short N_WORDS = 4;
@@ -75,7 +61,17 @@ public:
 	void getStatus();
 
 private:
-	// Registradores (32 bits)
+	/* Registradores (32 bits) do modulo:
+	 *	[0] = CMD
+	 *
+	 *	[1] = W1W0
+	 *	[2] = W3W2
+	 *
+	 *	[3] = KG0
+	 *	[4] = KG1
+	 *	[5] = KG2
+	 *	[6] = KG3
+	 */
 	uint32_t *REGS;
 
 	// Sub-chaves (16 bits)

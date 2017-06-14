@@ -5,14 +5,17 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
 ../IDEA.cpp \
+../IDEA_operations.cpp \
 ../main.cpp 
 
 OBJS += \
 ./IDEA.o \
+./IDEA_operations.o \
 ./main.o 
 
 CPP_DEPS += \
 ./IDEA.d \
+./IDEA_operations.d \
 ./main.d 
 
 

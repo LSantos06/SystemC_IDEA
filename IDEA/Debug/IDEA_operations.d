@@ -1,4 +1,4 @@
-main.d: ../main.cpp ../IDEA.h ../IDEA_operations.h \
+IDEA_operations.d: ../IDEA_operations.cpp ../IDEA_operations.h \
  /usr/local/systemc/include/systemc.h /usr/local/systemc/include/systemc \
  /usr/local/systemc/include/sysc/kernel/sc_cmnhdr.h \
  /usr/local/systemc/include/sysc/packages/boost/config.hpp \
@@ -112,8 +112,6 @@ main.d: ../main.cpp ../IDEA.h ../IDEA_operations.h \
  /usr/local/systemc/include/sysc/utils/sc_pvector.h \
  /usr/local/systemc/include/sysc/utils/sc_vector.h \
  /usr/local/systemc/include/sysc/packages/boost/utility/enable_if.hpp
-
-../IDEA.h:
 
 ../IDEA_operations.h:
 
