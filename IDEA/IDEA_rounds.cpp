@@ -10,7 +10,7 @@
 #include "IDEA_rounds.h"
 
 /*
- * Linha 1 de um round ou half-round
+ * Parte 1 de um round ou half-round
  *
  * Entradas:
  * 	- 4 primeiras sub-chaves de 16 bits
@@ -18,45 +18,39 @@
  * Saidas:
  *  - 4 palavras de 16 bits operadas
  */
-void linha_1(uint16_t, uint16_t, uint16_t, uint16_t){
-
+void parte_1(uint16_t *x, uint16_t k_a, uint16_t k_b, uint16_t k_c, uint16_t k_d){
+	x[0] = mul_IDEA(k_a, x[0]);
+	x[1] = add_IDEA(k_b, x[1]);
+	x[2] = add_IDEA(k_c, x[2]);
+	x[3] = mul_IDEA(k_d, x[3]);
 }
 
 /*
- * Linhas 2 e 3 de um round
- *
- * Entradas:
- * 	- 4 palavras de 16 bits
- * Saidas:
- *  - 2 palavras de 16 bits operadas
- */
-void linha_2_3(){
-
-}
-
-/*
- * Linhas 4 e 5 de um round
+ * Parte 2 de um round
  *
  * Entradas:
  * 	- 2 ultimas sub-chaves de 16 bits
- * 	- 2 palavras de 16 bits
- * Saidas:
- *  - 2 palavras de 16 bits operadas
- */
-void linha_4_5(uint16_t, uint16_t){
-
-}
-
-/*
- * Linhas 6 e 7 de um round
- *
- * Entradas:
  * 	- 4 palavras de 16 bits
  * Saidas:
- *  - 4 palavras de 16 bits operadas
+ *  - 4 palavras de 16 bits finais
  */
-void linha_6_7(){
+void parte_2(uint16_t *x, uint16_t k_e, uint16_t k_f){
+	uint16_t y[2],z[2];
 
+	y[0] = xor_IDEA(x[0], x[1]);
+	z[0] = xor_IDEA(x[2], x[3]);
+
+	y[1] = mul_IDEA(k_e, y[0]);
+	y[1] = add_IDEA(z[0], y[1]);
+	y[1] = mul_IDEA(k_f, y[1]);
+
+	z[1] = mul_IDEA(k_e, y[0]);
+	z[1] = add_IDEA(y[1],z[1]);
+
+	x[0] = xor_IDEA(y[1],x[0]);
+	x[1] = xor_IDEA(y[1],x[1]);
+	x[2] = xor_IDEA(z[1],x[2]);
+	x[3] = xor_IDEA(z[1],x[3]);
 }
 
 /*
@@ -69,10 +63,8 @@ void linha_6_7(){
  */
 // Round de operacoes repetido 8 vezes
 void round(){
-//	linha_1();
-//	linha_2_3();
-//	linha_4_5();
-//	linha_6_7();
+//	parte_1();
+//	parte_2();
 }
 
 /*
@@ -85,5 +77,5 @@ void round(){
  */
 // Round final que gera a saida
 void half_round(){
-//	linha_1();
+//	parte_1();
 }
