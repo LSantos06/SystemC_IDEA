@@ -15,6 +15,7 @@
 const short N_REGS = 7;
 const short N_WORDS = 4;
 const short N_SUBKEYS = 52;
+const short N_ROUNDS = 8;
 
 class idea
 	: public sc_module{

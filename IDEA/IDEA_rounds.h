@@ -22,9 +22,9 @@ void parte_2(uint16_t*, uint16_t, uint16_t);
 
 /* Rounds */
 // Round de operacoes repetido 8 vezes
-void round(uint16_t*);
+void round(uint16_t *x, uint16_t k_a, uint16_t k_b, uint16_t k_c, uint16_t k_d, uint16_t k_e, uint16_t k_f);
 
 // Round final que gera a saida
-void half_round(uint16_t*);
+void half_round(uint16_t *x, uint16_t k_a, uint16_t k_b, uint16_t k_c, uint16_t k_d);
 
 #endif

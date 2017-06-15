@@ -72,7 +72,7 @@ void idea::descifrar_cifrar(){
     for (unsigned int i = 0; i < N_WORDS; ++i)
     	WORDS[i] = 0;
 
-#if TESTES == 1
+#if TESTES == 1||2
 	// Valores de teste REGS[1] e REGS[2]
 	printf("Teste SEPARACAO\n");
     REGS[1] = 0x12345678;
@@ -102,7 +102,7 @@ void idea::descifrar_cifrar(){
 	printf("W3: 0x%x\n\n", WORDS[3]);
 #endif
 
-#if TESTES == 1
+#if TESTES == 2
 	// Testes para as operacoes
 	printf("Teste XOR\n");
 	printf("W0 xor W1 = 0x%x\n", xor_IDEA(WORDS[0],WORDS[1]));
@@ -117,6 +117,24 @@ void idea::descifrar_cifrar(){
 	printf("0 mul W1 = 0x%x\n", mul_IDEA(0,(uint32_t)WORDS[1]));
 	printf("W2 mul 0 = 0x%x\n", mul_IDEA((uint32_t)WORDS[2],0));
 	printf("MODULO_ADD mul 1 = 0x%x\n\n", mul_IDEA(MODULO_ADD,1));
+#endif
+
+	// Loop fazendo os rounds
+	int i;
+	for(i = 0; i < (N_ROUNDS*6); i+=6){
+		round(WORDS, SUBKEYS[i], SUBKEYS[i+1], SUBKEYS[i+2], SUBKEYS[i+3], SUBKEYS[i+4], SUBKEYS[i+5]);
+	}
+	// Final round
+	half_round(WORDS,SUBKEYS[i], SUBKEYS[i+1], SUBKEYS[i+2], SUBKEYS[i+3]);
+
+	// Juntando o resultado e armazenando nos registradores
+#if TESTES == 1||2
+	// Resultado IDEA
+	printf("Mensagem criptografada\n");
+	printf("W0: 0x%x\n", WORDS[0]);
+	printf("W1: 0x%x\n", WORDS[1]);
+	printf("W2: 0x%x\n", WORDS[2]);
+	printf("W3: 0x%x\n\n", WORDS[3]);
 #endif
 
 }

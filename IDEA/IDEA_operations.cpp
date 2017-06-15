@@ -32,7 +32,7 @@ uint16_t xor_IDEA(uint16_t a, uint16_t b){
  *  - soma as duas entradas e tira o modulo (16 bits)
  */
 uint16_t add_IDEA(uint16_t a, uint16_t b){
-#if	TESTES == 1
+#if	TESTES == 2
 	printf("add_IDEA (a + b) = 0x%x\n", (a + b));
 #endif
 	return ((a + b) % MODULO_ADD);
@@ -50,7 +50,7 @@ uint16_t add_IDEA(uint16_t a, uint16_t b){
 uint16_t mul_IDEA(uint32_t a, uint32_t b){
 	if(a == 0) a = MODULO_ADD;
 	if(b == 0) b = MODULO_ADD;
-#if TESTES == 1
+#if TESTES == 2
 	printf("mul_IDEA a = 0x%x\n", a);
 	printf("mul_IDEA b = 0x%x\n", b);
 	printf("mul_IDEA (a * b) = 0x%x\n", (a * b));

@@ -61,10 +61,9 @@ void parte_2(uint16_t *x, uint16_t k_e, uint16_t k_f){
  * Saidas:
  *  - 4 palavras de 16 bits operadas
  */
-// Round de operacoes repetido 8 vezes
-void round(){
-//	parte_1();
-//	parte_2();
+void round(uint16_t *x, uint16_t k_a, uint16_t k_b, uint16_t k_c, uint16_t k_d, uint16_t k_e, uint16_t k_f){
+	parte_1(x, k_a, k_b, k_c, k_d);
+	parte_2(x, k_e, k_f);
 }
 
 /*
@@ -76,6 +75,6 @@ void round(){
  *  - 4 palavras de 16 bits operadas
  */
 // Round final que gera a saida
-void half_round(){
-//	parte_1();
+void half_round(uint16_t *x, uint16_t k_a, uint16_t k_b, uint16_t k_c, uint16_t k_d){
+	parte_1(x, k_a, k_b, k_c, k_d);
 }
