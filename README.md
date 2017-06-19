@@ -37,4 +37,4 @@ A partir da _chave secreta_ de 128 bits, são geradas 52 _sub-chaves_ de 16 bits
   * GitHub: [LSantos06](https://github.com/LSantos06)
 
 #### Referências
-[Implementação em C](https://github.com/ivansarno/IDEA-cipher)
+* [ivansarno - Implementação do IDEA em C](https://github.com/ivansarno/IDEA-cipher)
