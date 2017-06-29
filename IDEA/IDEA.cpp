@@ -41,7 +41,23 @@ void idea::getCMD(){
  *  - 52 sub-chaves (16 bits cada)
  */
 void idea::subchaves_descifrar(){
-
+    int i = 4;
+    int16_t *decipher_subkeys = new int16_t[52];
+    decipher_subkeys[0] = mul_inv(SUBKEYS[48],65537);
+    decipher_subkeys[1] = add_inv(SUBKEYS[49]);
+    decipher_subkeys[2] = add_inv(SUBKEYS[50]);
+    decipher_subkeys[3] = mul_inv(SUBKEYS[51],65537);
+    while (i < 52) {
+        DECIPHER_SUBKEYS[i] = SUBKEYS[50-i];
+        DECIPHER_SUBKEYS[i+1] = SUBKEYS[51-i];
+        DECIPHER_SUBKEYS[i+2] = mul_inv(SUBKEYS[46-i],65537);
+        DECIPHER_SUBKEYS[i+3] = add_inv(SUBKEYS[48-i]);
+        DECIPHER_SUBKEYS[i+4] = add_inv(SUBKEYS[47-i]);
+        DECIPHER_SUBKEYS[i+5] = mul_inv(SUBKEYS[49-i],65537);
+        i += 6;
+    }
+    delete [] SUBKEYS;
+    SUBKEYS = decipher_subkeys;
 }
 
 /*
@@ -53,7 +69,91 @@ void idea::subchaves_descifrar(){
  *  - 52 sub-chaves (16 bits cada)
  */
 void idea::subchaves_cifrar(){
+    int i,j,k, offset, n_bits, T_transf;
+    i = 0;
+    T_transf = 0;
+    for (k = 0; k < 7; k++) {
+        offset = T_transf ? 22 : 25*k;
+        j = (offset/32)%4;
+        n_bits = 32 - (offset - j*32);
+        while (i < (k*8)+8 || (T_transf && i < 52)) {
+            int bits_missing, bits_remaining;
+            if(16 > n_bits){
+                bits_missing = 16 - n_bits;
+                bits_remaining = 0;
+            }
+            else{
+                bits_missing = 0;
+                bits_remaining = n_bits - 16;
+            }
+            uint32_t amount = (uint32_t)(((int64_t)1 << n_bits)-1);
+            SUBKEYS[i] = (int16_t)(((REGS[j] & amount) >> bits_remaining) << bits_missing);
+            if(bits_missing){
+                j = (j + 1)%4;
+                SUBKEYS[i] |= (int16_t)(REGS[j] >> 32 - bits_missing);
+            }
+            n_bits = (bits_missing ? 32 - bits_missing : bits_remaining);
+            i++;
+        }
+        if(i >= 48 && i < 52){
+            T_transf = 1;
+        }
+        else{
+            T_transf = 0;
+        }
+    }
+}
 
+/*
+ * Inverso Aditivo
+ *
+ * Entradas:
+ * 	- int16_t number : numero de 16 bits que deseja-se calcular o inverso aditivo 
+ * Saidas:
+ *  - inverso aditivo de number
+ */
+int16_t add_inv(int16_t number){
+    return 0-number;
+}
+ 
+/*
+ * Inverso Multiplicativo Modular
+ *
+ * Entradas:
+ * 	- int32_t a : numero de 32 bits o qual deseja-se calcular o inverso 
+ * 	              multiplicativo modular 
+ *  - int32_t m : numero de 32 bits que representa o modulo
+ * Saidas:
+ *  - Retorna o inverso multiplicativo modular do numero a (mod m), isto e,
+ *    encontra o numero x1, tal que, "a * x1 = 1 (mod m)" atraves do 
+ *    algoritmo de euclides extendido, assumindo que a e m sao 
+ *    relativamente primos, isto e, gcd(a, m) = 1.
+ */
+int16_t mul_inv(int32_t a, int32_t m) {
+    a = a&0xffff;
+    int32_t m0 = m, t, q;
+    int32_t x0 = 0, x1 = 1;
+ 
+    if (m == 1){
+      return 0;
+    }
+ 
+    while (a > 1)
+    {
+        q = a / m;
+        t = m;
+ 
+        m = a % m; 
+        a = t;
+        t = x0;
+        x0 = x1 - q * x0;
+        x1 = t;
+    }
+ 
+    if (x1 < 0){
+       x1 += m0;
+    }
+    return x1;
 }
 
 /*
