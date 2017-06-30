@@ -87,10 +87,10 @@ void idea::subchaves_cifrar(){
                 bits_remaining = n_bits - 16;
             }
             uint32_t amount = (uint32_t)(((int64_t)1 << n_bits)-1);
-            SUBKEYS[i] = (int16_t)(((REGS[j] & amount) >> bits_remaining) << bits_missing);
+            SUBKEYS[i] = (int16_t)(((REGS[j+3] & amount) >> bits_remaining) << bits_missing);
             if(bits_missing){
                 j = (j + 1)%4;
-                SUBKEYS[i] |= (int16_t)(REGS[j] >> 32 - bits_missing);
+                SUBKEYS[i] |= (int16_t)(REGS[j+3] >> 32 - bits_missing);
             }
             n_bits = (bits_missing ? 32 - bits_missing : bits_remaining);
             i++;
@@ -112,7 +112,7 @@ void idea::subchaves_cifrar(){
  * Saidas:
  *  - inverso aditivo de number
  */
-int16_t add_inv(int16_t number){
+int16_t idea::add_inv(int16_t number){
     return 0-number;
 }
  
@@ -129,7 +129,7 @@ int16_t add_inv(int16_t number){
  *    algoritmo de euclides extendido, assumindo que a e m sao 
  *    relativamente primos, isto e, gcd(a, m) = 1.
  */
-int16_t mul_inv(int32_t a, int32_t m) {
+int16_t idea::mul_inv(int32_t a, int32_t m) {
     a = a&0xffff;
     int32_t m0 = m, t, q;
     int32_t x0 = 0, x1 = 1;
