@@ -42,18 +42,18 @@ void idea::getCMD(){
  */
 void idea::subchaves_descifrar(){
     int i = 4;
-    int16_t *decipher_subkeys = new int16_t[52];
+    uint16_t *decipher_subkeys = new uint16_t[52];
     decipher_subkeys[0] = mul_inv(SUBKEYS[48],65537);
     decipher_subkeys[1] = add_inv(SUBKEYS[49]);
     decipher_subkeys[2] = add_inv(SUBKEYS[50]);
     decipher_subkeys[3] = mul_inv(SUBKEYS[51],65537);
     while (i < 52) {
-        DECIPHER_SUBKEYS[i] = SUBKEYS[50-i];
-        DECIPHER_SUBKEYS[i+1] = SUBKEYS[51-i];
-        DECIPHER_SUBKEYS[i+2] = mul_inv(SUBKEYS[46-i],65537);
-        DECIPHER_SUBKEYS[i+3] = add_inv(SUBKEYS[48-i]);
-        DECIPHER_SUBKEYS[i+4] = add_inv(SUBKEYS[47-i]);
-        DECIPHER_SUBKEYS[i+5] = mul_inv(SUBKEYS[49-i],65537);
+        decipher_subkeys[i] = SUBKEYS[50-i];
+        decipher_subkeys[i+1] = SUBKEYS[51-i];
+        decipher_subkeys[i+2] = mul_inv(SUBKEYS[46-i],65537);
+        decipher_subkeys[i+3] = add_inv(SUBKEYS[48-i]);
+        decipher_subkeys[i+4] = add_inv(SUBKEYS[47-i]);
+        decipher_subkeys[i+5] = mul_inv(SUBKEYS[49-i],65537);
         i += 6;
     }
     delete [] SUBKEYS;
@@ -90,7 +90,7 @@ void idea::subchaves_cifrar(){
             SUBKEYS[i] = (int16_t)(((REGS[j+3] & amount) >> bits_remaining) << bits_missing);
             if(bits_missing){
                 j = (j + 1)%4;
-                SUBKEYS[i] |= (int16_t)(REGS[j+3] >> 32 - bits_missing);
+                SUBKEYS[i] |= (int16_t)(REGS[j+3] >> (32 - bits_missing));
             }
             n_bits = (bits_missing ? 32 - bits_missing : bits_remaining);
             i++;
