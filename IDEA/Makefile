@@ -18,7 +18,7 @@ FLAGS           = -g -Wall -pedantic -Wno-long-long \
                  -I$(SYSTEMC_INC_DIR) 
 LDFLAGS         = -L$(SYSTEMC_LIB_DIR) -lsystemc -lm
 
-SRCS = IDEA.cpp IDEA_operations.cpp IDEA_rounds.cpp main.cpp
+SRCS = IDEA.cpp IDEA_operations.cpp IDEA_rounds.cpp IDEA_shell.cpp mastershell.cpp networkinterfacefrontendbase.cpp specialkernel.cpp main.cpp
 OBJS=$(SRCS:.cpp=.o)
 
 # main

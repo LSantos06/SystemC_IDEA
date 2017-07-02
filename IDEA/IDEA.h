@@ -11,6 +11,7 @@
 #define IDEA_H
 
 #include "IDEA_rounds.h"
+#include "IDEA_utils.h"
 
 const short N_REGS = 7;
 const short N_WORDS = 4;
@@ -39,13 +40,13 @@ public:
 	    for (unsigned int i = 0; i < N_SUBKEYS; ++i)
 	    	SUBKEYS[i] = 0;
 
-	}
+        SC_THREAD(execute);
 
+	}
 	/* Destrutor */
 	~idea();
 
 	/* Processos Herdados */
-
 
 	/* Processos */
 	// Pega o comando e decide a acao
@@ -60,6 +61,11 @@ public:
 
 	// Status atual do modulo de acordo com a enum
 	void getStatus();
+
+    sc_fifo_in<shell_idea_data_t> idea_in;
+    sc_fifo_out<idea_shell_data_t> idea_out;
+
+    void execute(void);
 
 private:
 	/* Registradores (32 bits) do modulo:

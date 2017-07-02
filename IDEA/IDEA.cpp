@@ -250,3 +250,34 @@ void idea::getStatus(){
 
 }
 
+void idea::execute(void){
+    shell_idea_data_t fromShell;
+    idea_shell_data_t toShell;
+    while (1) {
+        fromShell = idea_in.read();
+        if(fromShell.acao == READ){
+            toShell = REGS[fromShell.reg_index];
+            idea_out.write(toShell);
+        }
+        else if (fromShell.acao == WRITE) {
+           REGS[fromShell.reg_index] = fromShell.value;
+           if(fromShell.reg_index == CMD){
+               switch ((idea_cmd_t)REGS[CMD]){
+                   case IDEA_CYPHER:
+                       subchaves_cifrar();
+                       descifrar_cifrar();
+                       break;
+                   case IDEA_DECYPHER:
+                       subchaves_cifrar();
+                       descifrar_cifrar();
+                       break;
+                   case IDEA_BKEYS:
+                   case IDEA_IDLE:
+                   case NONE:
+                   default:
+                       break;
+               }
+           }
+        }
+    }
+}

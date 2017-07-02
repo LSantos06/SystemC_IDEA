@@ -7,14 +7,32 @@
  *  Lucas Santos 14/0151010
  */
 
+
+#include <systemc.h>
+#include "mastershell.h"
+#include "specialkernel.h"
 #include "IDEA.h"
+#include "IDEA_shell.h"
+#include "IDEA_utils.h"
 
-int sc_main (int arc, char * argv[]){
+int main()
+{
+    MasterShell masterShell("MasterShell");
 
-	/* Instanciacao do IDEA */
-	idea IDEA_i("IDEA_i");
+    idea IDEA_i("IDEA_i");
+    IDEA_Shell IDEA_Shell_i("IDEA_Shell_i");
+    sc_fifo<shell_idea_data_t> shell_idea_fifo(1);
+    sc_fifo<idea_shell_data_t> idea_shell_fifo(1);
+    IDEA_i.idea_out(idea_shell_fifo);
+    IDEA_Shell_i.shell_in(idea_shell_fifo);
+    IDEA_Shell_i.shell_out(shell_idea_fifo);
+    IDEA_i.idea_in(shell_idea_fifo);
 
-	IDEA_i.descifrar_cifrar();
+    SpecialKernel multKernel("specialKernel");
+    multKernel.connectMaster(&masterShell);
+    multKernel.connectSlave(&IDEA_i);
 
-	return 0;
+    sc_start(sc_time(100, SC_SEC),  SC_RUN_TO_TIME);
+    return 0;
 }
+
