@@ -62,8 +62,8 @@ public:
 	// Status atual do modulo de acordo com a enum
 	void getStatus();
 
-    sc_fifo_in<shell_idea_data_t> idea_in;
-    sc_fifo_out<idea_shell_data_t> idea_out;
+    sc_fifo_in<shell_idea_data_t *> idea_in;
+    sc_fifo_out<idea_shell_data_t *> idea_out;
 
     void execute(void);
 

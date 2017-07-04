@@ -251,17 +251,17 @@ void idea::getStatus(){
 }
 
 void idea::execute(void){
-    shell_idea_data_t fromShell;
-    idea_shell_data_t toShell;
+    shell_idea_data_t *fromShell;
+    idea_shell_data_t *toShell;
     while (1) {
         fromShell = idea_in.read();
-        if(fromShell.acao == READ){
-            toShell = REGS[fromShell.reg_index];
+        if(fromShell->acao == READ){
+            toShell = new uint32_t(REGS[fromShell->reg_index]);
             idea_out.write(toShell);
         }
-        else if (fromShell.acao == WRITE) {
-           REGS[fromShell.reg_index] = fromShell.value;
-           if(fromShell.reg_index == CMD){
+        else if (fromShell->acao == WRITE) {
+           REGS[fromShell->reg_index] = fromShell->value;
+           if(fromShell->reg_index == CMD){
                switch ((idea_cmd_t)REGS[CMD]){
                    case IDEA_CYPHER:
                        subchaves_cifrar();
@@ -279,5 +279,6 @@ void idea::execute(void){
                }
            }
         }
+        delete fromShell;
     }
 }

@@ -15,7 +15,7 @@ LD              = g++
 
 FLAGS           = -g -Wall -pedantic -Wno-long-long \
                  -DSC_INCLUDE_DYNAMIC_PROCESSES -fpermissive \
-                 -I$(SYSTEMC_INC_DIR) 
+                 -I$(SYSTEMC_INC_DIR)
 LDFLAGS         = -L$(SYSTEMC_LIB_DIR) -lsystemc -lm
 
 SRCS = IDEA.cpp IDEA_operations.cpp IDEA_rounds.cpp IDEA_shell.cpp mastershell.cpp networkinterfacefrontendbase.cpp specialkernel.cpp main.cpp

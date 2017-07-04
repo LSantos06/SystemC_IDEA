@@ -12,8 +12,8 @@ class IDEA_Shell : public sc_module, public NetworkInterfaceFrontEndBase
     SC_HAS_PROCESS(IDEA_Shell);
     void execute(void);
 public:
-    sc_fifo_out<shell_idea_data_t> shell_out;
-    sc_fifo_in<idea_shell_data_t> shell_in;
+    sc_fifo_out<shell_idea_data_t *> shell_out;
+    sc_fifo_in<idea_shell_data_t *> shell_in;
     IDEA_Shell(sc_module_name name);
 };
 

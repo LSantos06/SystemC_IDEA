@@ -65,7 +65,7 @@ void MasterShell::_threadRun()
     receivePayload(payload, &payloadSrc);
     encrypted_message[0] = payload.at(0);
     payload.clear();
-    printf("Message encrypted = #04x, #04x", encrypted_message[0], encrypted_message[1]);
+    printf("Message encrypted = #%04x, #%04x", encrypted_message[0], encrypted_message[1]);
        
     // Sending generate keys command
     payload.push_back(8);
@@ -90,5 +90,5 @@ void MasterShell::_threadRun()
     receivePayload(payload, &payloadSrc);
     decrypted_message[0] = payload.at(0);
     payload.clear();
-    printf("Message decrypted = #04x, #04x", decrypted_message[0], decrypted_message[1]);
+    printf("Message decrypted = #%04x, #%04x", decrypted_message[0], decrypted_message[1]);
 }

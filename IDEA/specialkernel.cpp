@@ -2,8 +2,8 @@
 
 SpecialKernel::SpecialKernel(sc_module_name name) :
     sc_module(name),
-    _frontEndMaster((void *)0),
-    _frontEndSlave((void *)0)
+    _frontEndMaster((INetworkInterfaceFrontEnd *)0),
+    _frontEndSlave((INetworkInterfaceFrontEnd *)0)
 {
     SC_THREAD(_threadConnectionMasterSlave);
 }

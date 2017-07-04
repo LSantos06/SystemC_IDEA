@@ -15,14 +15,14 @@
 #include "IDEA_shell.h"
 #include "IDEA_utils.h"
 
-int main()
+int sc_main(int argc, char *argv[])
 {
     MasterShell masterShell("MasterShell");
 
     idea IDEA_i("IDEA_i");
     IDEA_Shell IDEA_Shell_i("IDEA_Shell_i");
-    sc_fifo<shell_idea_data_t> shell_idea_fifo(1);
-    sc_fifo<idea_shell_data_t> idea_shell_fifo(1);
+    sc_fifo<shell_idea_data_t *> shell_idea_fifo(1);
+    sc_fifo<idea_shell_data_t *> idea_shell_fifo(1);
     IDEA_i.idea_out(idea_shell_fifo);
     IDEA_Shell_i.shell_in(idea_shell_fifo);
     IDEA_Shell_i.shell_out(shell_idea_fifo);
@@ -30,7 +30,7 @@ int main()
 
     SpecialKernel multKernel("specialKernel");
     multKernel.connectMaster(&masterShell);
-    multKernel.connectSlave(&IDEA_i);
+    multKernel.connectSlave(&IDEA_Shell_i);
 
     sc_start(sc_time(100, SC_SEC),  SC_RUN_TO_TIME);
     return 0;
