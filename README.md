@@ -35,3 +35,9 @@ A partir da _chave secreta_ de 128 bits, são geradas 52 _sub-chaves_ de 16 bits
 * Lucas Nascimento
   * Matrícula: 14/0151010
   * GitHub: [LSantos06](https://github.com/LSantos06)
+
+#### Referências
+* [ivansarno](https://github.com/ivansarno/IDEA-cipher)
+* [Roudo Terada (DCC-USP) 1999](https://github.com/LSantos06/SystemC_IDEA/blob/master/IDEA.pdf)
+* [Quadibloc](http://www.quadibloc.com/crypto/co040302.htm)
+* [Numaboa](http://www.numaboa.com.br/criptografia/bloco/336-idea?showall=&start=4)
