@@ -41,19 +41,47 @@ void idea::getCMD(){
  *  - 52 sub-chaves (16 bits cada)
  */
 void idea::subchaves_descifrar(){
+	// The decryption key schedule is:
+	// The first four subkeys for decryption are:
+	//   KD(1) = 1/K(49)
+	//   KD(2) = -K(50)
+	//   KD(3) = -K(51)
+	//   KD(4) = 1/K(52)
+	// and they do not quite follow the same pattern as the remaining subkeys which follow.
+	// The following is repeated eight times, adding 6 to every decryption key's index and subtracting 6 from every encryption key's index:
+	//   KD(5) = K(47)
+	//   KD(6) = K(48)
+	// ...
+	//   KD(7) = 1/K(43)
+	//   KD(8) = -K(45)
+	//   KD(9) = -K(44)
+	//   KD(10) = 1/K(46)
+
     int i = N_WORDS;
     uint16_t *decipher_subkeys = new uint16_t[N_SUBKEYS];
+    // KD(1) = 1/K(49)
     decipher_subkeys[0] = mul_inv_IDEA(SUBKEYS[48],MODULO_MUL);
+    // KD(2) = -K(50)
     decipher_subkeys[1] = add_inv_IDEA(SUBKEYS[49]);
+    // KD(3) = -K(51)
     decipher_subkeys[2] = add_inv_IDEA(SUBKEYS[50]);
+    // KD(4) = 1/K(52)
     decipher_subkeys[3] = mul_inv_IDEA(SUBKEYS[51],MODULO_MUL);
+    // ...
     while (i < N_SUBKEYS) {
+    	// KD(5) = K(47)
     	decipher_subkeys[i] = SUBKEYS[50-i];
+    	// KD(6) = K(48)
     	decipher_subkeys[i+1] = SUBKEYS[51-i];
+    	// KD(7) = 1/K(43)
     	decipher_subkeys[i+2] = mul_inv_IDEA(SUBKEYS[46-i],MODULO_MUL);
+    	// KD(8) = -K(45)
     	decipher_subkeys[i+3] = add_inv_IDEA(SUBKEYS[48-i]);
+    	// KD(9) = -K(44)
     	decipher_subkeys[i+4] = add_inv_IDEA(SUBKEYS[47-i]);
+    	// KD(10) = 1/K(46)
     	decipher_subkeys[i+5] = mul_inv_IDEA(SUBKEYS[49-i],MODULO_MUL);
+    	// Adding 6 to every decryption key's index and subtracting 6 from every encryption key's index
         i += 6;
     }
     delete [] SUBKEYS;
@@ -69,15 +97,17 @@ void idea::subchaves_descifrar(){
  *  - 52 sub-chaves (16 bits cada)
  */
 void idea::subchaves_cifrar(){
-    int i,j,k, offset, n_bits, T_transf;
+    int i, j, k, offset, n_bits, T_transf;
+    int bits_missing, bits_remaining;
+    uint32_t amount;
     i = 0;
     T_transf = 0;
     for (k = 0; k < 7; k++) {
+    	printf("\n");
         offset = T_transf ? 22 : 25*k;
         j = (offset/32)%4;
         n_bits = 32 - (offset - j*32);
         while (i < (k*8)+8 || (T_transf && i < N_SUBKEYS)) {
-            int bits_missing, bits_remaining;
             if(16 > n_bits){
                 bits_missing = 16 - n_bits;
                 bits_remaining = 0;
@@ -86,13 +116,13 @@ void idea::subchaves_cifrar(){
                 bits_missing = 0;
                 bits_remaining = n_bits - 16;
             }
-            uint32_t amount = (uint32_t)(((int64_t)1 << n_bits)-1);
-            SUBKEYS[i] = (uint16_t)(((REGS[j+3] & amount) >> bits_remaining) << bits_missing);
+            amount = (uint32_t)(((int64_t)1 << n_bits)-1);
+            SUBKEYS[i] = (uint16_t)(((REGS[j+6] & amount) >> bits_remaining) << bits_missing);
             if(bits_missing){
-                j = (j + 1)%4;
-                SUBKEYS[i] |= (uint16_t)(REGS[j+3] >> (32 - bits_missing));
+                j = (j - 1)%4;
+                SUBKEYS[i] |= (uint16_t)(REGS[j+6] >> (32 - bits_missing));
             }
-        	printf("K%d: 0x%x\n", i, SUBKEYS[i]);
+            printf("K%d: 0x%x\n", i+1, SUBKEYS[i]);
             n_bits = (bits_missing ? 32 - bits_missing : bits_remaining);
             i++;
         }
@@ -196,7 +226,7 @@ void idea::descifrar_cifrar(){
 	// Juntando o resultado e armazenando nos registradores
 #if TESTES == 1||2
 	// Resultado IDEA
-	printf("Mensagem criptografada\n");
+	printf("\nMensagem criptografada\n");
 	printf("W0: 0x%x\n", WORDS[0]);
 	printf("W1: 0x%x\n", WORDS[1]);
 	printf("W2: 0x%x\n", WORDS[2]);
