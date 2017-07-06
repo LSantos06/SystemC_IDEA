@@ -41,19 +41,19 @@ void idea::getCMD(){
  *  - 52 sub-chaves (16 bits cada)
  */
 void idea::subchaves_descifrar(){
-    int i = 4;
-    int16_t *decipher_subkeys = new int16_t[52];
-    decipher_subkeys[0] = mul_inv(SUBKEYS[48],65537);
-    decipher_subkeys[1] = add_inv(SUBKEYS[49]);
-    decipher_subkeys[2] = add_inv(SUBKEYS[50]);
-    decipher_subkeys[3] = mul_inv(SUBKEYS[51],65537);
-    while (i < 52) {
-        DECIPHER_SUBKEYS[i] = SUBKEYS[50-i];
-        DECIPHER_SUBKEYS[i+1] = SUBKEYS[51-i];
-        DECIPHER_SUBKEYS[i+2] = mul_inv(SUBKEYS[46-i],65537);
-        DECIPHER_SUBKEYS[i+3] = add_inv(SUBKEYS[48-i]);
-        DECIPHER_SUBKEYS[i+4] = add_inv(SUBKEYS[47-i]);
-        DECIPHER_SUBKEYS[i+5] = mul_inv(SUBKEYS[49-i],65537);
+    int i = N_WORDS;
+    uint16_t *decipher_subkeys = new uint16_t[N_SUBKEYS];
+    decipher_subkeys[0] = mul_inv_IDEA(SUBKEYS[48],MODULO_MUL);
+    decipher_subkeys[1] = add_inv_IDEA(SUBKEYS[49]);
+    decipher_subkeys[2] = add_inv_IDEA(SUBKEYS[50]);
+    decipher_subkeys[3] = mul_inv_IDEA(SUBKEYS[51],MODULO_MUL);
+    while (i < N_SUBKEYS) {
+    	decipher_subkeys[i] = SUBKEYS[50-i];
+    	decipher_subkeys[i+1] = SUBKEYS[51-i];
+    	decipher_subkeys[i+2] = mul_inv_IDEA(SUBKEYS[46-i],MODULO_MUL);
+    	decipher_subkeys[i+3] = add_inv_IDEA(SUBKEYS[48-i]);
+    	decipher_subkeys[i+4] = add_inv_IDEA(SUBKEYS[47-i]);
+    	decipher_subkeys[i+5] = mul_inv_IDEA(SUBKEYS[49-i],MODULO_MUL);
         i += 6;
     }
     delete [] SUBKEYS;
@@ -76,7 +76,7 @@ void idea::subchaves_cifrar(){
         offset = T_transf ? 22 : 25*k;
         j = (offset/32)%4;
         n_bits = 32 - (offset - j*32);
-        while (i < (k*8)+8 || (T_transf && i < 52)) {
+        while (i < (k*8)+8 || (T_transf && i < N_SUBKEYS)) {
             int bits_missing, bits_remaining;
             if(16 > n_bits){
                 bits_missing = 16 - n_bits;
@@ -87,15 +87,16 @@ void idea::subchaves_cifrar(){
                 bits_remaining = n_bits - 16;
             }
             uint32_t amount = (uint32_t)(((int64_t)1 << n_bits)-1);
-            SUBKEYS[i] = (int16_t)(((REGS[j+3] & amount) >> bits_remaining) << bits_missing);
+            SUBKEYS[i] = (uint16_t)(((REGS[j+3] & amount) >> bits_remaining) << bits_missing);
             if(bits_missing){
                 j = (j + 1)%4;
-                SUBKEYS[i] |= (int16_t)(REGS[j+3] >> 32 - bits_missing);
+                SUBKEYS[i] |= (uint16_t)(REGS[j+3] >> (32 - bits_missing));
             }
+        	printf("K%d: 0x%x\n", i, SUBKEYS[i]);
             n_bits = (bits_missing ? 32 - bits_missing : bits_remaining);
             i++;
         }
-        if(i >= 48 && i < 52){
+        if(i >= 48 && i < N_SUBKEYS){
             T_transf = 1;
         }
         else{
@@ -104,57 +105,6 @@ void idea::subchaves_cifrar(){
     }
 }
 
-/*
- * Inverso Aditivo
- *
- * Entradas:
- * 	- int16_t number : numero de 16 bits que deseja-se calcular o inverso aditivo 
- * Saidas:
- *  - inverso aditivo de number
- */
-int16_t idea::add_inv(int16_t number){
-    return 0-number;
-}
- 
-/*
- * Inverso Multiplicativo Modular
- *
- * Entradas:
- * 	- int32_t a : numero de 32 bits o qual deseja-se calcular o inverso 
- * 	              multiplicativo modular 
- *  - int32_t m : numero de 32 bits que representa o modulo
- * Saidas:
- *  - Retorna o inverso multiplicativo modular do numero a (mod m), isto e,
- *    encontra o numero x1, tal que, "a * x1 = 1 (mod m)" atraves do 
- *    algoritmo de euclides extendido, assumindo que a e m sao 
- *    relativamente primos, isto e, gcd(a, m) = 1.
- */
-int16_t idea::mul_inv(int32_t a, int32_t m) {
-    a = a&0xffff;
-    int32_t m0 = m, t, q;
-    int32_t x0 = 0, x1 = 1;
- 
-    if (m == 1){
-      return 0;
-    }
- 
-    while (a > 1)
-    {
-        q = a / m;
-        t = m;
- 
-        m = a % m; 
-        a = t;
-        t = x0;
-        x0 = x1 - q * x0;
-        x1 = t;
-    }
- 
-    if (x1 < 0){
-       x1 += m0;
-    }
-    return x1;
-}
 
 /*
  * Descifrar ou Cifrar uma entrada (64 bits)
@@ -175,9 +125,9 @@ void idea::descifrar_cifrar(){
 #if TESTES == 1||2
 	// Valores de teste REGS[1] e REGS[2]
 	printf("Teste SEPARACAO\n");
-    REGS[1] = 0x12345678;
+    REGS[1] = 0x00020003;
 	printf("W1W0: 0x%x\n", REGS[1]);
-	REGS[2] = 0x9ABCDEF0;
+	REGS[2] = 0x00000001;
 	printf("W3W2: 0x%x\n", REGS[2]);
 #endif
 
@@ -218,6 +168,22 @@ void idea::descifrar_cifrar(){
 	printf("W2 mul 0 = 0x%x\n", mul_IDEA((uint32_t)WORDS[2],0));
 	printf("MODULO_ADD mul 1 = 0x%x\n\n", mul_IDEA(MODULO_ADD,1));
 #endif
+
+#if TESTES == 1||2
+	// Valores de teste REGS[3], REGS[4], REGS[4] e REGS[5]
+	printf("Teste CIFRAR\n");
+    REGS[3] = 0x00070008;
+	printf("KG0: 0x%x\n", REGS[3]);
+	REGS[4] = 0x00050006;
+	printf("KG1: 0x%x\n", REGS[4]);
+    REGS[5] = 0x00030004;
+	printf("KG2: 0x%x\n", REGS[5]);
+	REGS[6] = 0x00010002;
+	printf("KG3: 0x%x\n", REGS[6]);
+#endif
+
+	// Geracao das sub-chaves para teste da cifragem
+	subchaves_cifrar();
 
 	// Loop fazendo os rounds
 	int i;
