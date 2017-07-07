@@ -12,7 +12,7 @@
 
 #include <systemc.h>
 
-#define TESTES 1
+//#define TESTES 1
 
 const int MODULO_ADD = 65536;
 const int MODULO_MUL = 65537;

@@ -16,7 +16,7 @@ idea::~idea(){
   if (REGS) delete [] REGS;
   REGS = (uint32_t *)0;
 
-  if (SUBKEYS) delete [] SUBKEYS;
+  //if (SUBKEYS) delete [] SUBKEYS;
   SUBKEYS = (uint16_t *)0;
 }
 
@@ -172,7 +172,7 @@ void idea::descifrar_cifrar(){
     for (unsigned int i = 0; i < N_WORDS; ++i)
     	WORDS[i] = 0;
 
-#if TESTES == 1||2
+#if TESTES == 1 || TESTES == 2
 	// Valores de teste REGS[1] e REGS[2]
 	printf("Teste SEPARACAO\n");
     REGS[1] = 0x12345678;
@@ -228,7 +228,7 @@ void idea::descifrar_cifrar(){
 	half_round(WORDS,SUBKEYS[i], SUBKEYS[i+1], SUBKEYS[i+2], SUBKEYS[i+3]);
 
 	// Juntando o resultado e armazenando nos registradores
-#if TESTES == 1||2
+#if TESTES == 1 || TESTES == 2
 	// Resultado IDEA
 	printf("Mensagem criptografada\n");
 	printf("W0: 0x%x\n", WORDS[0]);
@@ -279,6 +279,6 @@ void idea::execute(void){
                }
            }
         }
-        delete fromShell;
+        //delete fromShell;
     }
 }

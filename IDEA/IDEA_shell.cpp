@@ -12,9 +12,12 @@ void IDEA_Shell::execute(void) {
     idea_shell_data_t *fromIdea;
     while (1) {
         int payloadSrc;
+        int payloadDst=0;
         std::vector<uint32_t> payload;
-        receivePayload(payload,&payloadSrc);
+
+        receivePayload(payload, &payloadSrc);
         toIdea = new shell_idea_data_t();
+
         switch ((reg_index_t)payload.at(0)) {
             case CIFRA_OUT_H:
                 toIdea->acao = READ;
@@ -24,8 +27,8 @@ void IDEA_Shell::execute(void) {
                 fromIdea = shell_in.read();
                 payload.clear();
                 payload.push_back(static_cast<uint32_t>(*fromIdea));
-                sendPayload(payload,payloadSrc);
-                delete fromIdea;
+                sendPayload(payload,payloadDst);
+                //delete fromIdea;
                 payload.clear();
                 break;
             case CIFRA_OUT_L:
@@ -36,8 +39,8 @@ void IDEA_Shell::execute(void) {
                 fromIdea = shell_in.read();
                 payload.clear();
                 payload.push_back(static_cast<uint32_t>(*fromIdea));
-                sendPayload(payload,payloadSrc);
-                delete fromIdea;
+                sendPayload(payload,payloadDst);
+                //delete fromIdea;
                 payload.clear();
                 break;
             case CIFRA_IN_H:
@@ -46,6 +49,7 @@ void IDEA_Shell::execute(void) {
                 toIdea->value = payload.at(1);
                 shell_out.write(toIdea);
                 payload.clear();
+                sendPayload(payload,payloadDst);
                 break;
             case CIFRA_IN_L:
                 toIdea->acao = WRITE;
@@ -53,6 +57,7 @@ void IDEA_Shell::execute(void) {
                 toIdea->value = payload.at(1);
                 shell_out.write(toIdea);
                 payload.clear();
+                sendPayload(payload,payloadDst);
                 break;
             case CHAVE_128_3:
                 toIdea->acao = WRITE;
@@ -60,6 +65,7 @@ void IDEA_Shell::execute(void) {
                 toIdea->value = payload.at(1);
                 shell_out.write(toIdea);
                 payload.clear();
+                sendPayload(payload,payloadDst);
                 break;
             case CHAVE_128_2:
                 toIdea->acao = WRITE;
@@ -67,6 +73,7 @@ void IDEA_Shell::execute(void) {
                 toIdea->value = payload.at(1);
                 shell_out.write(toIdea);
                 payload.clear();
+                sendPayload(payload,payloadDst);
                 break;
             case CHAVE_128_1:
                 toIdea->acao = WRITE;
@@ -74,6 +81,7 @@ void IDEA_Shell::execute(void) {
                 toIdea->value = payload.at(1);
                 shell_out.write(toIdea);
                 payload.clear();
+                sendPayload(payload,payloadDst);
                 break;
             case CHAVE_128_0:
                 toIdea->acao = WRITE;
@@ -81,6 +89,7 @@ void IDEA_Shell::execute(void) {
                 toIdea->value = payload.at(1);
                 shell_out.write(toIdea);
                 payload.clear();
+                sendPayload(payload,payloadDst);
                 break;
             case COMMAND:
                 toIdea->acao = WRITE;
@@ -88,6 +97,7 @@ void IDEA_Shell::execute(void) {
                 toIdea->value = payload.at(1);
                 shell_out.write(toIdea);
                 payload.clear();
+                sendPayload(payload,payloadDst);
             default:
                 break;
         }
