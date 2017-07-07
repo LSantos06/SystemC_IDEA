@@ -57,3 +57,55 @@ uint16_t mul_IDEA(uint32_t a, uint32_t b){
 #endif
 	return (uint16_t)((a * b) % MODULO_MUL);
 }
+
+/*
+ * Inverso Aditivo
+ *
+ * Entradas:
+ * 	- int16_t number : numero de 16 bits que deseja-se calcular o inverso aditivo
+ * Saidas:
+ *  - inverso aditivo de number
+ */
+int16_t add_inv_IDEA(int16_t number){
+    return 0-number;
+}
+
+/*
+ * Inverso Multiplicativo Modular
+ *
+ * Entradas:
+ * 	- int32_t a : numero de 32 bits o qual deseja-se calcular o inverso
+ * 	              multiplicativo modular
+ *  - int32_t m : numero de 32 bits que representa o modulo
+ * Saidas:
+ *  - Retorna o inverso multiplicativo modular do numero a (mod m), isto e,
+ *    encontra o numero x1, tal que, "a * x1 = 1 (mod m)" atraves do
+ *    algoritmo de euclides extendido, assumindo que a e m sao
+ *    relativamente primos, isto e, gcd(a, m) = 1.
+ */
+int16_t mul_inv_IDEA(int32_t a, int32_t m) {
+    a = a&0xffff;
+    int32_t m0 = m, t, q;
+    int32_t x0 = 0, x1 = 1;
+
+    if (m == 1){
+      return 0;
+    }
+
+    while (a > 1)
+    {
+        q = a / m;
+        t = m;
+
+        m = a % m;
+        a = t;
+        t = x0;
+        x0 = x1 - q * x0;
+        x1 = t;
+    }
+
+    if (x1 < 0){
+       x1 += m0;
+    }
+    return x1;
+}
