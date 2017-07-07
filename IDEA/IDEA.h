@@ -77,10 +77,6 @@ private:
 
 	// Sub-chaves (16 bits)
 	uint16_t *SUBKEYS;
-
-    int16_t add_inv(int16_t number);
-    int16_t mul_inv(int32_t a, int32_t m);
-
 };
 
 
