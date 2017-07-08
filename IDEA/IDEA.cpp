@@ -9,6 +9,26 @@
 
 #include "IDEA.h"
 
+
+/*
+ * Construtor
+ */
+idea::idea(sc_module_name nome_)
+    : sc_module(nome_){
+
+    // Inicializando os REGS
+    REGS = new uint32_t[N_REGS];
+    for (unsigned int i = 0; i < N_REGS; ++i)
+        REGS[i] = 0;
+    // Inicializando as SUBKEYS
+    SUBKEYS = new uint16_t[N_SUBKEYS];
+    for (unsigned int i = 0; i < N_SUBKEYS; ++i)
+        SUBKEYS[i] = 0;
+
+    SC_THREAD(execute);
+
+}
+
 /*
  * Destrutor
  */
@@ -56,8 +76,15 @@ void idea::subchaves_descifrar(){
     	decipher_subkeys[i+5] = mul_inv_IDEA(SUBKEYS[49-i],MODULO_MUL);
         i += 6;
     }
-    delete [] SUBKEYS;
+    //delete [] SUBKEYS;
     SUBKEYS = decipher_subkeys;
+
+#if TESTES == 1 || TESTES == 2
+    for(int i = 0; i < 52; i++){
+        printf("K%d: 0x%x\n", i, SUBKEYS[i]);
+    }
+#endif
+
 }
 
 /*
@@ -92,7 +119,9 @@ void idea::subchaves_cifrar(){
                 j = (j + 1)%4;
                 SUBKEYS[i] |= (uint16_t)(REGS[j+3] >> (32 - bits_missing));
             }
+#if TESTES == 1 || TESTES == 2
         	printf("K%d: 0x%x\n", i, SUBKEYS[i]);
+#endif
             n_bits = (bits_missing ? 32 - bits_missing : bits_remaining);
             i++;
         }
@@ -169,7 +198,7 @@ void idea::descifrar_cifrar(){
 	printf("MODULO_ADD mul 1 = 0x%x\n\n", mul_IDEA(MODULO_ADD,1));
 #endif
 
-#if TESTES == 1||2
+#if TESTES == 1 || TESTES == 2
 	// Valores de teste REGS[3], REGS[4], REGS[4] e REGS[5]
 	printf("Teste CIFRAR\n");
     REGS[3] = 0x00070008;
@@ -181,9 +210,6 @@ void idea::descifrar_cifrar(){
 	REGS[6] = 0x00010002;
 	printf("KG3: 0x%x\n", REGS[6]);
 #endif
-
-	// Geracao das sub-chaves para teste da cifragem
-	subchaves_cifrar();
 
 	// Loop fazendo os rounds
 	int i;
@@ -203,6 +229,10 @@ void idea::descifrar_cifrar(){
 	printf("W3: 0x%x\n\n", WORDS[3]);
 #endif
 
+	REGS[2] = WORDS[0];
+    REGS[2] |= (WORDS[1] << 16);
+    REGS[1] = WORDS[2];
+    REGS[1] |= (WORDS[3] << 16);
 }
 
 /*
@@ -234,7 +264,7 @@ void idea::execute(void){
                        descifrar_cifrar();
                        break;
                    case IDEA_DECYPHER:
-                       subchaves_cifrar();
+                       subchaves_descifrar();
                        descifrar_cifrar();
                        break;
                    case IDEA_BKEYS:
