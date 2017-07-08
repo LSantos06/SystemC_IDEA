@@ -41,22 +41,77 @@ void idea::getCMD(){
  *  - 52 sub-chaves (16 bits cada)
  */
 void idea::subchaves_descifrar(){
-    int i = 4;
-    uint16_t *decipher_subkeys = new uint16_t[52];
-    decipher_subkeys[0] = mul_inv(SUBKEYS[48],65537);
-    decipher_subkeys[1] = add_inv(SUBKEYS[49]);
-    decipher_subkeys[2] = add_inv(SUBKEYS[50]);
-    decipher_subkeys[3] = mul_inv(SUBKEYS[51],65537);
-    while (i < 52) {
-        decipher_subkeys[i] = SUBKEYS[50-i];
-        decipher_subkeys[i+1] = SUBKEYS[51-i];
-        decipher_subkeys[i+2] = mul_inv(SUBKEYS[46-i],65537);
-        decipher_subkeys[i+3] = add_inv(SUBKEYS[48-i]);
-        decipher_subkeys[i+4] = add_inv(SUBKEYS[47-i]);
-        decipher_subkeys[i+5] = mul_inv(SUBKEYS[49-i],65537);
+	// The decryption key schedule is:
+	// The first four subkeys for decryption are:
+	//   KD(1) = 1/K(49)
+	//   KD(2) = -K(50)
+	//   KD(3) = -K(51)
+	//   KD(4) = 1/K(52)
+	// and they do not quite follow the same pattern as the remaining subkeys which follow.
+	// The following is repeated eight times, adding 6 to every decryption key's index and subtracting 6 from every encryption key's index:
+	//   KD(5) = K(47)
+	//   KD(6) = K(48)
+	// ...
+	//   KD(7) = 1/K(43)
+	//   KD(8) = -K(45)
+	//   KD(9) = -K(44)
+	//   KD(10) = 1/K(46)
+
+    int i = N_WORDS;
+    uint16_t *decipher_subkeys = new uint16_t[N_SUBKEYS];
+    // KD(1) = 1/K(49)
+    decipher_subkeys[0] = mul_inv_IDEA(SUBKEYS[48],MODULO_MUL);
+    // KD(2) = -K(50)
+    decipher_subkeys[1] = add_inv_IDEA(SUBKEYS[49]);
+    // KD(3) = -K(51)
+    decipher_subkeys[2] = add_inv_IDEA(SUBKEYS[50]);
+    // KD(4) = 1/K(52)
+    decipher_subkeys[3] = mul_inv_IDEA(SUBKEYS[51],MODULO_MUL);
+#if TESTES == 1
+	printf("KD%d: 0x%x\n", i-4, decipher_subkeys[i-4]);
+	printf("KD%d: 0x%x\n", i-3, decipher_subkeys[i-3]);
+	printf("KD%d: 0x%x\n", i-2, decipher_subkeys[i-2]);
+	printf("KD%d: 0x%x\n", i-1, decipher_subkeys[i-1]);
+#endif
+    // ...
+    while (i < N_SUBKEYS) {
+    	// KD(5) = K(47)
+    	decipher_subkeys[i] = SUBKEYS[50-i];
+    	// KD(6) = K(48)
+    	decipher_subkeys[i+1] = SUBKEYS[51-i];
+    	// KD(7) = 1/K(43)
+    	decipher_subkeys[i+2] = mul_inv_IDEA(SUBKEYS[46-i],MODULO_MUL);
+    	// KD(8) = -K(45)
+    	decipher_subkeys[i+3] = add_inv_IDEA(SUBKEYS[48-i]);
+    	// KD(9) = -K(44)
+    	decipher_subkeys[i+4] = add_inv_IDEA(SUBKEYS[47-i]);
+    	// KD(10) = 1/K(46)
+    	decipher_subkeys[i+5] = mul_inv_IDEA(SUBKEYS[49-i],MODULO_MUL);
+    	// Adding 6 to every decryption key's index and subtracting 6 from every encryption key's index
+#if TESTES == 1
+    	printf("KD%d: 0x%x\n", i, decipher_subkeys[i]);
+		printf("KD%d: 0x%x\n", i+1, decipher_subkeys[i+1]);
+		printf("KD%d: 0x%x\n", i+2, decipher_subkeys[i+2]);
+		printf("KD%d: 0x%x\n", i+3, decipher_subkeys[i+3]);
+		printf("KD%d: 0x%x\n", i+4, decipher_subkeys[i+4]);
+		printf("KD%d: 0x%x\n", i+5, decipher_subkeys[i+5]);
+#endif
         i += 6;
     }
-    delete [] SUBKEYS;
+    // Auxiliar para sub-chaves da ultima transformacao T
+    uint16_t aux49 = decipher_subkeys[49];
+
+    // Ultima transformacao T
+    decipher_subkeys[49] = decipher_subkeys[50];
+    decipher_subkeys[50] = aux49;
+
+#if TESTES == 1
+	printf("KD48: 0x%x\n", decipher_subkeys[48]);
+	printf("KD49: 0x%x\n", decipher_subkeys[49]);
+	printf("KD50: 0x%x\n", decipher_subkeys[50]);
+	printf("KD51: 0x%x\n", decipher_subkeys[51]);
+#endif
+
     SUBKEYS = decipher_subkeys;
 }
 
@@ -69,92 +124,87 @@ void idea::subchaves_descifrar(){
  *  - 52 sub-chaves (16 bits cada)
  */
 void idea::subchaves_cifrar(){
-    int i,j,k, offset, n_bits, T_transf;
-    i = 0;
-    T_transf = 0;
-    for (k = 0; k < 7; k++) {
-        offset = T_transf ? 22 : 25*k;
-        j = (offset/32)%4;
-        n_bits = 32 - (offset - j*32);
-        while (i < (k*8)+8 || (T_transf && i < 52)) {
-            int bits_missing, bits_remaining;
-            if(16 > n_bits){
-                bits_missing = 16 - n_bits;
-                bits_remaining = 0;
-            }
-            else{
-                bits_missing = 0;
-                bits_remaining = n_bits - 16;
-            }
-            uint32_t amount = (uint32_t)(((int64_t)1 << n_bits)-1);
-            SUBKEYS[i] = (int16_t)(((REGS[j+3] & amount) >> bits_remaining) << bits_missing);
-            if(bits_missing){
-                j = (j + 1)%4;
-                SUBKEYS[i] |= (int16_t)(REGS[j+3] >> (32 - bits_missing));
-            }
-            n_bits = (bits_missing ? 32 - bits_missing : bits_remaining);
-            i++;
-        }
-        if(i >= 48 && i < 52){
-            T_transf = 1;
-        }
-        else{
-            T_transf = 0;
-        }
-    }
+	// Variavel temporaria para manipulacao da chave secreta
+	uint64_t chave_secreta_high = ((uint64_t)REGS[6] << 32) | (uint64_t)REGS[5];
+	uint64_t chave_secreta_low = ((uint64_t)REGS[4] << 32) | (uint64_t)REGS[3];
+	uint64_t chave_secreta_aux;
+
+	for(unsigned int i = 0; i < 52; i+=8){
+		// Primeiras iteracaoes
+		if(i < 8 && i < 48){
+			// Geracao das sub-chaves apos o deslocamento
+			SUBKEYS[i] = chave_secreta_high >> 48;
+			SUBKEYS[i+1] = chave_secreta_high >> 32;
+			SUBKEYS[i+2] = chave_secreta_high >> 16;
+			SUBKEYS[i+3] = chave_secreta_high;
+			SUBKEYS[i+4] = chave_secreta_low  >> 48;
+			SUBKEYS[i+5] = chave_secreta_low  >> 32;
+			SUBKEYS[i+6] = chave_secreta_low  >> 16;
+			SUBKEYS[i+7] = chave_secreta_low;
+#if TESTES == 1
+			printf("K%d: 0x%x\n", i, SUBKEYS[i]);
+			printf("K%d: 0x%x\n", i+1, SUBKEYS[i+1]);
+			printf("K%d: 0x%x\n", i+2, SUBKEYS[i+2]);
+			printf("K%d: 0x%x\n", i+3, SUBKEYS[i+3]);
+			printf("K%d: 0x%x\n", i+4, SUBKEYS[i+4]);
+			printf("K%d: 0x%x\n", i+5, SUBKEYS[i+5]);
+			printf("K%d: 0x%x\n", i+6, SUBKEYS[i+6]);
+			printf("K%d: 0x%x\n", i+7, SUBKEYS[i+7]);
+#endif
+		}
+
+		// Iteracoes seguintes
+		if(i >= 8 && i < 48){
+			// Deslocamento circular de 25 bits
+			chave_secreta_aux = chave_secreta_high;
+			chave_secreta_high = (chave_secreta_high << 25) | (chave_secreta_low >> 39);
+			chave_secreta_low = (chave_secreta_low << 25) | (chave_secreta_aux >> 39);
+
+			// Geracao das sub-chaves apos o deslocamento
+			SUBKEYS[i] = chave_secreta_high >> 48;
+			SUBKEYS[i+1] = chave_secreta_high >> 32;
+			SUBKEYS[i+2] = chave_secreta_high >> 16;
+			SUBKEYS[i+3] = chave_secreta_high;
+			SUBKEYS[i+4] = chave_secreta_low  >> 48;
+			SUBKEYS[i+5] = chave_secreta_low  >> 32;
+			SUBKEYS[i+6] = chave_secreta_low  >> 16;
+			SUBKEYS[i+7] = chave_secreta_low;
+
+#if TESTES == 1
+			printf("K%d: 0x%x\n", i, SUBKEYS[i]);
+			printf("K%d: 0x%x\n", i+1, SUBKEYS[i+1]);
+			printf("K%d: 0x%x\n", i+2, SUBKEYS[i+2]);
+			printf("K%d: 0x%x\n", i+3, SUBKEYS[i+3]);
+			printf("K%d: 0x%x\n", i+4, SUBKEYS[i+4]);
+			printf("K%d: 0x%x\n", i+5, SUBKEYS[i+5]);
+			printf("K%d: 0x%x\n", i+6, SUBKEYS[i+6]);
+			printf("K%d: 0x%x\n", i+7, SUBKEYS[i+7]);
+#endif
+		}
+
+		// Ultima transformacao T
+		if(i >= 48){
+			// Deslocamento circular de 22 bits
+			chave_secreta_aux = chave_secreta_high;
+			chave_secreta_high = (chave_secreta_high << 25) | (chave_secreta_low >> 39);
+			chave_secreta_low = (chave_secreta_low << 25) | (chave_secreta_aux >> 39);
+
+			// Geracao das sub-chaves apos o deslocamento
+			SUBKEYS[i] = chave_secreta_high >> 48;
+			SUBKEYS[i+1] = chave_secreta_high >> 32;
+			SUBKEYS[i+2] = chave_secreta_high >> 16;
+			SUBKEYS[i+3] = chave_secreta_high;
+
+#if TESTES == 1
+			printf("K%d: 0x%x\n", i, SUBKEYS[i]);
+			printf("K%d: 0x%x\n", i+1, SUBKEYS[i+1]);
+			printf("K%d: 0x%x\n", i+2, SUBKEYS[i+2]);
+			printf("K%d: 0x%x\n", i+3, SUBKEYS[i+3]);
+#endif
+		}
+	}
 }
 
-/*
- * Inverso Aditivo
- *
- * Entradas:
- * 	- int16_t number : numero de 16 bits que deseja-se calcular o inverso aditivo 
- * Saidas:
- *  - inverso aditivo de number
- */
-int16_t idea::add_inv(int16_t number){
-    return 0-number;
-}
- 
-/*
- * Inverso Multiplicativo Modular
- *
- * Entradas:
- * 	- int32_t a : numero de 32 bits o qual deseja-se calcular o inverso 
- * 	              multiplicativo modular 
- *  - int32_t m : numero de 32 bits que representa o modulo
- * Saidas:
- *  - Retorna o inverso multiplicativo modular do numero a (mod m), isto e,
- *    encontra o numero x1, tal que, "a * x1 = 1 (mod m)" atraves do 
- *    algoritmo de euclides extendido, assumindo que a e m sao 
- *    relativamente primos, isto e, gcd(a, m) = 1.
- */
-int16_t idea::mul_inv(int32_t a, int32_t m) {
-    a = a&0xffff;
-    int32_t m0 = m, t, q;
-    int32_t x0 = 0, x1 = 1;
- 
-    if (m == 1){
-      return 0;
-    }
- 
-    while (a > 1)
-    {
-        q = a / m;
-        t = m;
- 
-        m = a % m; 
-        a = t;
-        t = x0;
-        x0 = x1 - q * x0;
-        x1 = t;
-    }
- 
-    if (x1 < 0){
-       x1 += m0;
-    }
-    return x1;
-}
 
 /*
  * Descifrar ou Cifrar uma entrada (64 bits)
@@ -175,9 +225,9 @@ void idea::descifrar_cifrar(){
 #if TESTES == 1 || TESTES == 2
 	// Valores de teste REGS[1] e REGS[2]
 	printf("Teste SEPARACAO\n");
-    REGS[1] = 0x12345678;
+    REGS[1] = 0x00020003;
 	printf("W1W0: 0x%x\n", REGS[1]);
-	REGS[2] = 0x9ABCDEF0;
+	REGS[2] = 0x00000001;
 	printf("W3W2: 0x%x\n", REGS[2]);
 #endif
 
@@ -194,7 +244,7 @@ void idea::descifrar_cifrar(){
 	// WORDS[3] = W3 = 2 bytes MAIS significativos de REGS[2]
 	WORDS[3] = REGS[2] >> 16;
 
-#if TESTES == 1
+#if TESTES == 1||2
 	// Resultado separacao
 	printf("W0: 0x%x\n", WORDS[0]);
 	printf("W1: 0x%x\n", WORDS[1]);
@@ -219,24 +269,77 @@ void idea::descifrar_cifrar(){
 	printf("MODULO_ADD mul 1 = 0x%x\n\n", mul_IDEA(MODULO_ADD,1));
 #endif
 
+#if TESTES == 1
+	// Valores de teste REGS[3], REGS[4], REGS[4] e REGS[5]
+	printf("Teste CIFRAR e DESCIFRAR\n");
+    REGS[3] = 0x00070008;
+	printf("KG0: 0x%x\n", REGS[3]);
+	REGS[4] = 0x00050006;
+	printf("KG1: 0x%x\n", REGS[4]);
+    REGS[5] = 0x00030004;
+	printf("KG2: 0x%x\n", REGS[5]);
+	REGS[6] = 0x00010002;
+	printf("KG3: 0x%x\n", REGS[6]);
+
+	printf("\nTESTE SUBCHAVES CIFRA\n");
+
+	// Geracao das sub-chaves para teste da cifragem
+	subchaves_cifrar();
+
+	printf("\nTESTE CRIPTO\n");
+
 	// Loop fazendo os rounds
 	int i;
 	for(i = 0; i < (N_ROUNDS*6); i+=6){
 		round(WORDS, SUBKEYS[i], SUBKEYS[i+1], SUBKEYS[i+2], SUBKEYS[i+3], SUBKEYS[i+4], SUBKEYS[i+5]);
+		printf("%d\n", i);
+		printf("W0: 0x%x\n", WORDS[0]);
+		printf("W1: 0x%x\n", WORDS[1]);
+		printf("W2: 0x%x\n", WORDS[2]);
+		printf("W3: 0x%x\n\n", WORDS[3]);
 	}
 	// Final round
+	// Xa_final = Xa' mul K49
+	// Xb_final = Xc' add K50
+	// Xc_final = Xb' add K51
+	// Xd_final = Xd' mul K52
 	half_round(WORDS,SUBKEYS[i], SUBKEYS[i+1], SUBKEYS[i+2], SUBKEYS[i+3]);
 
-	// Juntando o resultado e armazenando nos registradores
-#if TESTES == 1 || TESTES == 2
 	// Resultado IDEA
-	printf("Mensagem criptografada\n");
+	printf("\nMensagem criptografada\n");
 	printf("W0: 0x%x\n", WORDS[0]);
 	printf("W1: 0x%x\n", WORDS[1]);
 	printf("W2: 0x%x\n", WORDS[2]);
 	printf("W3: 0x%x\n\n", WORDS[3]);
-#endif
 
+
+	printf("TESTE SUBCHAVES DECIFRA\n");
+
+	// Geracao das sub-chaves para teste da decifragem
+	subchaves_descifrar();
+
+	printf("\nTESTE DECRIPTO\n");
+
+	// Loop fazendo os rounds
+	for(i = 0; i < (N_ROUNDS*6); i+=6){
+		round(WORDS, SUBKEYS[i], SUBKEYS[i+1], SUBKEYS[i+2], SUBKEYS[i+3], SUBKEYS[i+4], SUBKEYS[i+5]);
+		printf("%d\n", i);
+		printf("W0: 0x%x\n", WORDS[0]);
+		printf("W1: 0x%x\n", WORDS[1]);
+		printf("W2: 0x%x\n", WORDS[2]);
+		printf("W3: 0x%x\n\n", WORDS[3]);
+	}
+	// Final round
+	half_round(WORDS,SUBKEYS[i], SUBKEYS[i+1], SUBKEYS[i+2], SUBKEYS[i+3]);
+
+	// Resultado IDEA
+	printf("\nMensagem decriptografada\n");
+	printf("W0: 0x%x\n", WORDS[0]);
+	printf("W1: 0x%x\n", WORDS[1]);
+	printf("W2: 0x%x\n", WORDS[2]);
+	printf("W3: 0x%x\n\n", WORDS[3]);
+
+#endif
 }
 
 /*
