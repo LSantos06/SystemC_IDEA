@@ -67,10 +67,12 @@ void idea::subchaves_descifrar(){
     decipher_subkeys[2] = add_inv_IDEA(SUBKEYS[50]);
     // KD(4) = 1/K(52)
     decipher_subkeys[3] = mul_inv_IDEA(SUBKEYS[51],MODULO_MUL);
+#if TESTES == 1
 	printf("KD%d: 0x%x\n", i-4, decipher_subkeys[i-4]);
 	printf("KD%d: 0x%x\n", i-3, decipher_subkeys[i-3]);
 	printf("KD%d: 0x%x\n", i-2, decipher_subkeys[i-2]);
 	printf("KD%d: 0x%x\n", i-1, decipher_subkeys[i-1]);
+#endif
     // ...
     while (i < N_SUBKEYS) {
     	// KD(5) = K(47)
@@ -86,12 +88,14 @@ void idea::subchaves_descifrar(){
     	// KD(10) = 1/K(46)
     	decipher_subkeys[i+5] = mul_inv_IDEA(SUBKEYS[49-i],MODULO_MUL);
     	// Adding 6 to every decryption key's index and subtracting 6 from every encryption key's index
-		printf("KD%d: 0x%x\n", i, decipher_subkeys[i]);
+#if TESTES == 1
+    	printf("KD%d: 0x%x\n", i, decipher_subkeys[i]);
 		printf("KD%d: 0x%x\n", i+1, decipher_subkeys[i+1]);
 		printf("KD%d: 0x%x\n", i+2, decipher_subkeys[i+2]);
 		printf("KD%d: 0x%x\n", i+3, decipher_subkeys[i+3]);
 		printf("KD%d: 0x%x\n", i+4, decipher_subkeys[i+4]);
 		printf("KD%d: 0x%x\n", i+5, decipher_subkeys[i+5]);
+#endif
         i += 6;
     }
     // Auxiliar para sub-chaves da ultima transformacao T
@@ -101,10 +105,12 @@ void idea::subchaves_descifrar(){
     decipher_subkeys[49] = decipher_subkeys[50];
     decipher_subkeys[50] = aux49;
 
+#if TESTES == 1
 	printf("KD48: 0x%x\n", decipher_subkeys[48]);
 	printf("KD49: 0x%x\n", decipher_subkeys[49]);
 	printf("KD50: 0x%x\n", decipher_subkeys[50]);
 	printf("KD51: 0x%x\n", decipher_subkeys[51]);
+#endif
 
     SUBKEYS = decipher_subkeys;
 }
@@ -135,7 +141,7 @@ void idea::subchaves_cifrar(){
 			SUBKEYS[i+5] = chave_secreta_low  >> 32;
 			SUBKEYS[i+6] = chave_secreta_low  >> 16;
 			SUBKEYS[i+7] = chave_secreta_low;
-
+#if TESTES == 1
 			printf("K%d: 0x%x\n", i, SUBKEYS[i]);
 			printf("K%d: 0x%x\n", i+1, SUBKEYS[i+1]);
 			printf("K%d: 0x%x\n", i+2, SUBKEYS[i+2]);
@@ -144,6 +150,7 @@ void idea::subchaves_cifrar(){
 			printf("K%d: 0x%x\n", i+5, SUBKEYS[i+5]);
 			printf("K%d: 0x%x\n", i+6, SUBKEYS[i+6]);
 			printf("K%d: 0x%x\n", i+7, SUBKEYS[i+7]);
+#endif
 		}
 
 		// Iteracoes seguintes
@@ -163,6 +170,7 @@ void idea::subchaves_cifrar(){
 			SUBKEYS[i+6] = chave_secreta_low  >> 16;
 			SUBKEYS[i+7] = chave_secreta_low;
 
+#if TESTES == 1
 			printf("K%d: 0x%x\n", i, SUBKEYS[i]);
 			printf("K%d: 0x%x\n", i+1, SUBKEYS[i+1]);
 			printf("K%d: 0x%x\n", i+2, SUBKEYS[i+2]);
@@ -171,6 +179,7 @@ void idea::subchaves_cifrar(){
 			printf("K%d: 0x%x\n", i+5, SUBKEYS[i+5]);
 			printf("K%d: 0x%x\n", i+6, SUBKEYS[i+6]);
 			printf("K%d: 0x%x\n", i+7, SUBKEYS[i+7]);
+#endif
 		}
 
 		// Ultima transformacao T
@@ -186,10 +195,12 @@ void idea::subchaves_cifrar(){
 			SUBKEYS[i+2] = chave_secreta_high >> 16;
 			SUBKEYS[i+3] = chave_secreta_high;
 
+#if TESTES == 1
 			printf("K%d: 0x%x\n", i, SUBKEYS[i]);
 			printf("K%d: 0x%x\n", i+1, SUBKEYS[i+1]);
 			printf("K%d: 0x%x\n", i+2, SUBKEYS[i+2]);
 			printf("K%d: 0x%x\n", i+3, SUBKEYS[i+3]);
+#endif
 		}
 	}
 }
@@ -233,7 +244,7 @@ void idea::descifrar_cifrar(){
 	// WORDS[3] = W3 = 2 bytes MAIS significativos de REGS[2]
 	WORDS[3] = REGS[2] >> 16;
 
-#if TESTES == 1
+#if TESTES == 1||2
 	// Resultado separacao
 	printf("W0: 0x%x\n", WORDS[0]);
 	printf("W1: 0x%x\n", WORDS[1]);
@@ -258,7 +269,7 @@ void idea::descifrar_cifrar(){
 	printf("MODULO_ADD mul 1 = 0x%x\n\n", mul_IDEA(MODULO_ADD,1));
 #endif
 
-#if TESTES == 1||2
+#if TESTES == 1
 	// Valores de teste REGS[3], REGS[4], REGS[4] e REGS[5]
 	printf("Teste CIFRAR e DESCIFRAR\n");
     REGS[3] = 0x00070008;
@@ -269,14 +280,15 @@ void idea::descifrar_cifrar(){
 	printf("KG2: 0x%x\n", REGS[5]);
 	REGS[6] = 0x00010002;
 	printf("KG3: 0x%x\n", REGS[6]);
-#endif
+
+	printf("\nTESTE SUBCHAVES CIFRA\n");
 
 	// Geracao das sub-chaves para teste da cifragem
-	printf("\nTESTE SUB CIFRA\n");
 	subchaves_cifrar();
 
-	// Loop fazendo os rounds
 	printf("\nTESTE CRIPTO\n");
+
+	// Loop fazendo os rounds
 	int i;
 	for(i = 0; i < (N_ROUNDS*6); i+=6){
 		round(WORDS, SUBKEYS[i], SUBKEYS[i+1], SUBKEYS[i+2], SUBKEYS[i+3], SUBKEYS[i+4], SUBKEYS[i+5]);
@@ -292,28 +304,23 @@ void idea::descifrar_cifrar(){
 	// Xc_final = Xb' add K51
 	// Xd_final = Xd' mul K52
 	half_round(WORDS,SUBKEYS[i], SUBKEYS[i+1], SUBKEYS[i+2], SUBKEYS[i+3]);
-	printf("%d\n", i);
-	printf("W0: 0x%x\n", WORDS[0]);
-	printf("W1: 0x%x\n", WORDS[1]);
-	printf("W2: 0x%x\n", WORDS[2]);
-	printf("W3: 0x%x\n\n", WORDS[3]);
 
-	// Juntando o resultado e armazenando nos registradores
-#if TESTES == 1||2
 	// Resultado IDEA
 	printf("\nMensagem criptografada\n");
 	printf("W0: 0x%x\n", WORDS[0]);
 	printf("W1: 0x%x\n", WORDS[1]);
 	printf("W2: 0x%x\n", WORDS[2]);
 	printf("W3: 0x%x\n\n", WORDS[3]);
-#endif
+
+
+	printf("TESTE SUBCHAVES DECIFRA\n");
 
 	// Geracao das sub-chaves para teste da decifragem
-	printf("TESTE SUB DECIFRA\n");
 	subchaves_descifrar();
 
-	// Loop fazendo os rounds
 	printf("\nTESTE DECRIPTO\n");
+
+	// Loop fazendo os rounds
 	for(i = 0; i < (N_ROUNDS*6); i+=6){
 		round(WORDS, SUBKEYS[i], SUBKEYS[i+1], SUBKEYS[i+2], SUBKEYS[i+3], SUBKEYS[i+4], SUBKEYS[i+5]);
 		printf("%d\n", i);
@@ -324,11 +331,15 @@ void idea::descifrar_cifrar(){
 	}
 	// Final round
 	half_round(WORDS,SUBKEYS[i], SUBKEYS[i+1], SUBKEYS[i+2], SUBKEYS[i+3]);
-	printf("%d\n", i);
+
+	// Resultado IDEA
+	printf("\nMensagem decriptografada\n");
 	printf("W0: 0x%x\n", WORDS[0]);
 	printf("W1: 0x%x\n", WORDS[1]);
 	printf("W2: 0x%x\n", WORDS[2]);
 	printf("W3: 0x%x\n\n", WORDS[3]);
+
+#endif
 }
 
 /*
