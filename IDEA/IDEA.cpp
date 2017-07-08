@@ -16,7 +16,7 @@ idea::~idea(){
   if (REGS) delete [] REGS;
   REGS = (uint32_t *)0;
 
-  if (SUBKEYS) delete [] SUBKEYS;
+  //if (SUBKEYS) delete [] SUBKEYS;
   SUBKEYS = (uint16_t *)0;
 }
 
@@ -222,7 +222,7 @@ void idea::descifrar_cifrar(){
     for (unsigned int i = 0; i < N_WORDS; ++i)
     	WORDS[i] = 0;
 
-#if TESTES == 1||2
+#if TESTES == 1 || TESTES == 2
 	// Valores de teste REGS[1] e REGS[2]
 	printf("Teste SEPARACAO\n");
     REGS[1] = 0x00020003;
@@ -353,3 +353,35 @@ void idea::getStatus(){
 
 }
 
+void idea::execute(void){
+    shell_idea_data_t *fromShell;
+    idea_shell_data_t *toShell;
+    while (1) {
+        fromShell = idea_in.read();
+        if(fromShell->acao == READ){
+            toShell = new uint32_t(REGS[fromShell->reg_index]);
+            idea_out.write(toShell);
+        }
+        else if (fromShell->acao == WRITE) {
+           REGS[fromShell->reg_index] = fromShell->value;
+           if(fromShell->reg_index == CMD){
+               switch ((idea_cmd_t)REGS[CMD]){
+                   case IDEA_CYPHER:
+                       subchaves_cifrar();
+                       descifrar_cifrar();
+                       break;
+                   case IDEA_DECYPHER:
+                       subchaves_cifrar();
+                       descifrar_cifrar();
+                       break;
+                   case IDEA_BKEYS:
+                   case IDEA_IDLE:
+                   case NONE:
+                   default:
+                       break;
+               }
+           }
+        }
+        //delete fromShell;
+    }
+}
