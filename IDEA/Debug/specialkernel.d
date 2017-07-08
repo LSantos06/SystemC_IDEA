@@ -1,4 +1,4 @@
-IDEA.d: ../IDEA.cpp ../IDEA.h ../IDEA_rounds.h ../IDEA_operations.h \
+specialkernel.d: ../specialkernel.cpp ../specialkernel.h \
  /usr/local/systemc/include/systemc.h /usr/local/systemc/include/systemc \
  /usr/local/systemc/include/sysc/kernel/sc_cmnhdr.h \
  /usr/local/systemc/include/sysc/packages/boost/config.hpp \
@@ -112,13 +112,9 @@ IDEA.d: ../IDEA.cpp ../IDEA.h ../IDEA_rounds.h ../IDEA_operations.h \
  /usr/local/systemc/include/sysc/utils/sc_pvector.h \
  /usr/local/systemc/include/sysc/utils/sc_vector.h \
  /usr/local/systemc/include/sysc/packages/boost/utility/enable_if.hpp \
- ../IDEA_utils.h
+ ../inetworkinterfacefrontend.h
 
-../IDEA.h:
-
-../IDEA_rounds.h:
-
-../IDEA_operations.h:
+../specialkernel.h:
 
 /usr/local/systemc/include/systemc.h:
 
@@ -348,4 +344,4 @@ IDEA.d: ../IDEA.cpp ../IDEA.h ../IDEA_rounds.h ../IDEA_operations.h \
 
 /usr/local/systemc/include/sysc/packages/boost/utility/enable_if.hpp:
 
-../IDEA_utils.h:
+../inetworkinterfacefrontend.h:
