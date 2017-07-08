@@ -94,6 +94,18 @@ void idea::subchaves_descifrar(){
 		printf("KD%d: 0x%x\n", i+5, decipher_subkeys[i+5]);
         i += 6;
     }
+    // Auxiliar para sub-chaves da ultima transformacao T
+    uint16_t aux49 = decipher_subkeys[49];
+
+    // Ultima transformacao T
+    decipher_subkeys[49] = decipher_subkeys[50];
+    decipher_subkeys[50] = aux49;
+
+	printf("KD48: 0x%x\n", decipher_subkeys[48]);
+	printf("KD49: 0x%x\n", decipher_subkeys[49]);
+	printf("KD50: 0x%x\n", decipher_subkeys[50]);
+	printf("KD51: 0x%x\n", decipher_subkeys[51]);
+
     SUBKEYS = decipher_subkeys;
 }
 
@@ -260,24 +272,31 @@ void idea::descifrar_cifrar(){
 #endif
 
 	// Geracao das sub-chaves para teste da cifragem
-	printf("TESTE SUB CIFRA");
+	printf("\nTESTE SUB CIFRA\n");
 	subchaves_cifrar();
 
-	// Geracao das sub-chaves para teste da decifragem
-	printf("TESTE SUB DECIFRA");
-	subchaves_descifrar();
-
 	// Loop fazendo os rounds
+	printf("\nTESTE CRIPTO\n");
 	int i;
 	for(i = 0; i < (N_ROUNDS*6); i+=6){
 		round(WORDS, SUBKEYS[i], SUBKEYS[i+1], SUBKEYS[i+2], SUBKEYS[i+3], SUBKEYS[i+4], SUBKEYS[i+5]);
+		printf("%d\n", i);
 		printf("W0: 0x%x\n", WORDS[0]);
 		printf("W1: 0x%x\n", WORDS[1]);
 		printf("W2: 0x%x\n", WORDS[2]);
 		printf("W3: 0x%x\n\n", WORDS[3]);
 	}
 	// Final round
+	// Xa_final = Xa' mul K49
+	// Xb_final = Xc' add K50
+	// Xc_final = Xb' add K51
+	// Xd_final = Xd' mul K52
 	half_round(WORDS,SUBKEYS[i], SUBKEYS[i+1], SUBKEYS[i+2], SUBKEYS[i+3]);
+	printf("%d\n", i);
+	printf("W0: 0x%x\n", WORDS[0]);
+	printf("W1: 0x%x\n", WORDS[1]);
+	printf("W2: 0x%x\n", WORDS[2]);
+	printf("W3: 0x%x\n\n", WORDS[3]);
 
 	// Juntando o resultado e armazenando nos registradores
 #if TESTES == 1||2
@@ -289,6 +308,27 @@ void idea::descifrar_cifrar(){
 	printf("W3: 0x%x\n\n", WORDS[3]);
 #endif
 
+	// Geracao das sub-chaves para teste da decifragem
+	printf("TESTE SUB DECIFRA\n");
+	subchaves_descifrar();
+
+	// Loop fazendo os rounds
+	printf("\nTESTE DECRIPTO\n");
+	for(i = 0; i < (N_ROUNDS*6); i+=6){
+		round(WORDS, SUBKEYS[i], SUBKEYS[i+1], SUBKEYS[i+2], SUBKEYS[i+3], SUBKEYS[i+4], SUBKEYS[i+5]);
+		printf("%d\n", i);
+		printf("W0: 0x%x\n", WORDS[0]);
+		printf("W1: 0x%x\n", WORDS[1]);
+		printf("W2: 0x%x\n", WORDS[2]);
+		printf("W3: 0x%x\n\n", WORDS[3]);
+	}
+	// Final round
+	half_round(WORDS,SUBKEYS[i], SUBKEYS[i+1], SUBKEYS[i+2], SUBKEYS[i+3]);
+	printf("%d\n", i);
+	printf("W0: 0x%x\n", WORDS[0]);
+	printf("W1: 0x%x\n", WORDS[1]);
+	printf("W2: 0x%x\n", WORDS[2]);
+	printf("W3: 0x%x\n\n", WORDS[3]);
 }
 
 /*
