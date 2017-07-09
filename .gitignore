@@ -4,3 +4,7 @@ IDEA/compile_commands.json
 IDEA/tags
 IDEA/cscope.out
 IDEA/Debug/
+IDEA/.libs
+IDEA/*.lo
+IDEA/*.o
+IDEA/main
