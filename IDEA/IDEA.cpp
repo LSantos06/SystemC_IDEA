@@ -271,7 +271,7 @@ void idea::descifrar_cifrar(){
 	// WORDS[3] = W3 = 2 bytes MAIS significativos de REGS[2]
 	WORDS[3] = REGS[2] >> 16;
 
-#if TESTES == 1||2
+#if TESTES == 1|| TESTES == 2
 	// Resultado separacao
 	printf("W0: 0x%x\n", WORDS[0]);
 	printf("W1: 0x%x\n", WORDS[1]);
