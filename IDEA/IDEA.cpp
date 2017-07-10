@@ -9,6 +9,26 @@
 
 #include "IDEA.h"
 
+
+/*
+ * Construtor
+ */
+idea::idea(sc_module_name nome_)
+    : sc_module(nome_){
+
+    // Inicializando os REGS
+    REGS = new uint32_t[N_REGS];
+    for (unsigned int i = 0; i < N_REGS; ++i)
+        REGS[i] = 0;
+    // Inicializando as SUBKEYS
+    SUBKEYS = new uint16_t[N_SUBKEYS];
+    for (unsigned int i = 0; i < N_SUBKEYS; ++i)
+        SUBKEYS[i] = 0;
+
+    SC_THREAD(execute);
+
+}
+
 /*
  * Destrutor
  */
@@ -113,6 +133,13 @@ void idea::subchaves_descifrar(){
 #endif
 
     SUBKEYS = decipher_subkeys;
+
+#if TESTES == 1 || TESTES == 2
+    for(int i = 0; i < 52; i++){
+        printf("K%d: 0x%x\n", i, SUBKEYS[i]);
+    }
+#endif
+
 }
 
 /*
@@ -244,7 +271,7 @@ void idea::descifrar_cifrar(){
 	// WORDS[3] = W3 = 2 bytes MAIS significativos de REGS[2]
 	WORDS[3] = REGS[2] >> 16;
 
-#if TESTES == 1||2
+#if TESTES == 1|| TESTES == 2
 	// Resultado separacao
 	printf("W0: 0x%x\n", WORDS[0]);
 	printf("W1: 0x%x\n", WORDS[1]);
@@ -288,15 +315,23 @@ void idea::descifrar_cifrar(){
 
 	printf("\nTESTE CRIPTO\n");
 
+#endif
 	// Loop fazendo os rounds
 	int i;
 	for(i = 0; i < (N_ROUNDS*6); i+=6){
 		round(WORDS, SUBKEYS[i], SUBKEYS[i+1], SUBKEYS[i+2], SUBKEYS[i+3], SUBKEYS[i+4], SUBKEYS[i+5]);
-		printf("%d\n", i);
+#if TESTES == 1
+		printf("K%d: 0x%x\n", i, SUBKEYS[i]);
+		printf("K%d: 0x%x\n", i+1,SUBKEYS[i+1]);
+		printf("K%d: 0x%x\n", i+2,SUBKEYS[i+2]);
+		printf("K%d: 0x%x\n", i+3,SUBKEYS[i+3]);
+		printf("K%d: 0x%x\n", i+4,SUBKEYS[i+4]);
+		printf("K%d: 0x%x\n", i+5,SUBKEYS[i+5]);
 		printf("W0: 0x%x\n", WORDS[0]);
 		printf("W1: 0x%x\n", WORDS[1]);
 		printf("W2: 0x%x\n", WORDS[2]);
 		printf("W3: 0x%x\n\n", WORDS[3]);
+#endif
 	}
 	// Final round
 	// Xa_final = Xa' mul K49
@@ -305,14 +340,22 @@ void idea::descifrar_cifrar(){
 	// Xd_final = Xd' mul K52
 	half_round(WORDS,SUBKEYS[i], SUBKEYS[i+1], SUBKEYS[i+2], SUBKEYS[i+3]);
 
+#if TESTES == 1
 	// Resultado IDEA
 	printf("\nMensagem criptografada\n");
 	printf("W0: 0x%x\n", WORDS[0]);
 	printf("W1: 0x%x\n", WORDS[1]);
 	printf("W2: 0x%x\n", WORDS[2]);
 	printf("W3: 0x%x\n\n", WORDS[3]);
+#endif
 
+	// Armazenando o resultado
+	REGS[1] = WORDS[0];
+    REGS[1] |= (WORDS[1] << 16);
+    REGS[2] = WORDS[2];
+    REGS[2] |= (WORDS[3] << 16);
 
+#if TESTES == 1
 	printf("TESTE SUBCHAVES DECIFRA\n");
 
 	// Geracao das sub-chaves para teste da decifragem
@@ -371,7 +414,7 @@ void idea::execute(void){
                        descifrar_cifrar();
                        break;
                    case IDEA_DECYPHER:
-                       subchaves_cifrar();
+                       subchaves_descifrar();
                        descifrar_cifrar();
                        break;
                    case IDEA_BKEYS:

@@ -28,21 +28,7 @@ public:
 	SC_HAS_PROCESS(idea);
 
 	/* Construtor */
-	idea(sc_module_name nome_)
-		: sc_module(nome_){
-
-		// Inicializando os REGS
-		REGS = new uint32_t[N_REGS];
-	    for (unsigned int i = 0; i < N_REGS; ++i)
-	    	REGS[i] = 0;
-		// Inicializando as SUBKEYS
-	    SUBKEYS = new uint16_t[N_SUBKEYS];
-	    for (unsigned int i = 0; i < N_SUBKEYS; ++i)
-	    	SUBKEYS[i] = 0;
-
-        SC_THREAD(execute);
-
-	}
+	idea(sc_module_name nome_);
 	/* Destrutor */
 	~idea();
 

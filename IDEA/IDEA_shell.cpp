@@ -98,7 +98,10 @@ void IDEA_Shell::execute(void) {
                 shell_out.write(toIdea);
                 payload.clear();
                 sendPayload(payload,payloadDst);
+                break;
             default:
+                payload.clear();
+                sendPayload(payload,payloadDst);
                 break;
         }
     }
