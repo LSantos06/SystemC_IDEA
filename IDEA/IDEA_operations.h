@@ -12,7 +12,7 @@
 
 #include <systemc.h>
 
-#define TESTES 1
+//#define TESTES 1
 // 1 cifragem e decifragem
 // 2 operacoes
 
