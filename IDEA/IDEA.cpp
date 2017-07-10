@@ -321,7 +321,12 @@ void idea::descifrar_cifrar(){
 	for(i = 0; i < (N_ROUNDS*6); i+=6){
 		round(WORDS, SUBKEYS[i], SUBKEYS[i+1], SUBKEYS[i+2], SUBKEYS[i+3], SUBKEYS[i+4], SUBKEYS[i+5]);
 #if TESTES == 1
-		printf("%d\n", i);
+		printf("K%d: 0x%x\n", i, SUBKEYS[i]);
+		printf("K%d: 0x%x\n", i+1,SUBKEYS[i+1]);
+		printf("K%d: 0x%x\n", i+2,SUBKEYS[i+2]);
+		printf("K%d: 0x%x\n", i+3,SUBKEYS[i+3]);
+		printf("K%d: 0x%x\n", i+4,SUBKEYS[i+4]);
+		printf("K%d: 0x%x\n", i+5,SUBKEYS[i+5]);
 		printf("W0: 0x%x\n", WORDS[0]);
 		printf("W1: 0x%x\n", WORDS[1]);
 		printf("W2: 0x%x\n", WORDS[2]);
@@ -344,10 +349,11 @@ void idea::descifrar_cifrar(){
 	printf("W3: 0x%x\n\n", WORDS[3]);
 #endif
 
-	REGS[2] = WORDS[0];
-    REGS[2] |= (WORDS[1] << 16);
-    REGS[1] = WORDS[2];
-    REGS[1] |= (WORDS[3] << 16);
+	// Armazenando o resultado
+	REGS[1] = WORDS[0];
+    REGS[1] |= (WORDS[1] << 16);
+    REGS[2] = WORDS[2];
+    REGS[2] |= (WORDS[3] << 16);
 
 #if TESTES == 1
 	printf("TESTE SUBCHAVES DECIFRA\n");

@@ -11,7 +11,7 @@ MasterShell::MasterShell(sc_module_name name) :
 
 void MasterShell::_threadRun()
 {
-    uint32_t message[2] = {0x00020003, 0x00000001};
+    uint32_t message[2] = {0x00aa00bb, 0x000000cc};
 	uint32_t encrypted_message[2];
 	uint32_t decrypted_message[2];
     int payloadSrc;
@@ -22,37 +22,37 @@ void MasterShell::_threadRun()
     
     // Sending values of message and key to encrypt
     payload.push_back(2);
-    payload.push_back(message[0]);
-    sendPayload(payload, payloadDst);
-    receivePayload(payload, &payloadSrc);
-    payload.clear();
-
-    payload.push_back(3);
     payload.push_back(message[1]);
     sendPayload(payload, payloadDst);
     receivePayload(payload, &payloadSrc);
     payload.clear();
 
+    payload.push_back(3);
+    payload.push_back(message[0]);
+    sendPayload(payload, payloadDst);
+    receivePayload(payload, &payloadSrc);
+    payload.clear();
+
     payload.push_back(4);
-    payload.push_back(0x00070008);
+    payload.push_back(0x00010002);
     sendPayload(payload, payloadDst);
     receivePayload(payload, &payloadSrc);
     payload.clear();
 
     payload.push_back(5);
-    payload.push_back(0x00050006);
-    sendPayload(payload, payloadDst);
-    receivePayload(payload, &payloadSrc);
-    payload.clear();
-
-    payload.push_back(6);
     payload.push_back(0x00030004);
     sendPayload(payload, payloadDst);
     receivePayload(payload, &payloadSrc);
     payload.clear();
 
+    payload.push_back(6);
+    payload.push_back(0x00050006);
+    sendPayload(payload, payloadDst);
+    receivePayload(payload, &payloadSrc);
+    payload.clear();
+
     payload.push_back(7);
-    payload.push_back(0x00010002);
+    payload.push_back(0x00070008);
     sendPayload(payload, payloadDst);
     receivePayload(payload, &payloadSrc);
     payload.clear();
