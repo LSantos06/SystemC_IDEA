@@ -22,9 +22,6 @@ class idea
 	: public sc_module{
 
 public:
-	/* Portas */
-
-
 	SC_HAS_PROCESS(idea);
 
 	/* Construtor */
@@ -32,21 +29,13 @@ public:
 	/* Destrutor */
 	~idea();
 
-	/* Processos Herdados */
-
 	/* Processos */
-	// Pega o comando e decide a acao
-	void getCMD();
-
 	// Geracao das 52 subchaves para descifrar
 	void subchaves_descifrar();
 	// Geracao das 52 subchaves para cifrar
 	void subchaves_cifrar();
 	// Descifrar ou Cifrar uma entrada (64 bits)
 	void descifrar_cifrar();
-
-	// Status atual do modulo de acordo com a enum
-	void getStatus();
 
     sc_fifo_in<shell_idea_data_t *> idea_in;
     sc_fifo_out<idea_shell_data_t *> idea_out;

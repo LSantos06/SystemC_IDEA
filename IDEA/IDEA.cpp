@@ -41,18 +41,6 @@ idea::~idea(){
 }
 
 /*
- * Pega o comando e decide a acao
- *
- * Entradas:
- * 	- registrador CMD (32 bits)
- * Saidas:
- *  - acao de acordo com o valor do CMD
- */
-void idea::getCMD(){
-
-}
-
-/*
  * Geracao das 52 subchaves para descifrar
  *
  * Entradas:
@@ -312,17 +300,6 @@ void idea::descifrar_cifrar(){
     REGS[1] |= (WORDS[1] << 16);
     REGS[2] = WORDS[2];
     REGS[2] |= (WORDS[3] << 16);
-}
-
-/*
- * Status atual do modulo de acordo com a enum
- *
- * Entradas:
- * Saidas:
- *  - status atual
- */
-void idea::getStatus(){
-
 }
 
 void idea::execute(void){

@@ -22,7 +22,8 @@ MasterShell::MasterShell(sc_module_name name) :
 
 void MasterShell::_threadRun()
 {
-    uint32_t message[2] = {0x01234567, 0x8ABCDEF0};
+    //uint32_t message[2] = {0x01234567, 0x8ABCDEF0};
+    uint32_t message[2] = {0x00000001, 0x00020003};
 	uint32_t encrypted_message[2];
 	uint32_t decrypted_message[2];
     int payloadSrc;
